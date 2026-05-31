@@ -97,18 +97,22 @@ npm install
 ## 📁 instalacion backend
 
 cd backend
+
 npm init -y
 npm install express pg ioredis jsonwebtoken jwks-rsa dotenv cors helmet @aws-sdk/client-secrets-manager
 npm install --save-dev nodemon
 
 
-## para git hub 
+## Para git hub 
 
 1. Preparar todos los cambios nuevos o modificados
+
 git add .
 
 2. Guardar el punto de control con un mensaje claro
-git commit -m "docs: agregar archivo README.md con la documentación del proyecto"
+
+git commit -m "cambios"
 
 3. Subir los cambios a la nube (ya no necesitas el -u origin main)
+
 git push
