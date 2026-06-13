@@ -10,9 +10,9 @@
  */
 const register = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint register' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -22,9 +22,9 @@ const register = async (req, res) => {
  */
 const confirm = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint confirm' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -34,9 +34,9 @@ const confirm = async (req, res) => {
  */
 const login = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint login' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -46,9 +46,9 @@ const login = async (req, res) => {
  */
 const refresh = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint refresh' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -58,9 +58,9 @@ const refresh = async (req, res) => {
  */
 const forgotPassword = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint forgotPassword' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -70,9 +70,9 @@ const forgotPassword = async (req, res) => {
  */
 const resetPassword = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint resetPassword' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -82,9 +82,9 @@ const resetPassword = async (req, res) => {
  */
 const logout = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint logout' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -94,9 +94,9 @@ const logout = async (req, res) => {
  */
 const setupMFA = async (req, res) => {
   try {
-    return res.status(501).json({ error: 'Not implemented' });
+    res.status(200).json({ message: 'Endpoint setupMFA' });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 };
 
