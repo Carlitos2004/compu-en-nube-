@@ -9,6 +9,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const healthRoutes = require('../routes/health');
+const authRoutes = require('../routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,9 @@ app.use(express.json());
 
 // Rutas de salud y monitoreo
 app.use('/api/health', healthRoutes);
+
+// Rutas de autenticación
+app.use('/api/auth', authRoutes);
 
 // ==================== SERVIDOR ====================
 
