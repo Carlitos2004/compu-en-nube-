@@ -58,9 +58,9 @@ const refresh = async (req, res) => {
  */
 const forgotPassword = async (req, res) => {
   try {
-    res.status(200).json({ message: 'Endpoint forgotPassword' });
+    return res.status(501).json({ error: 'Not implemented' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
