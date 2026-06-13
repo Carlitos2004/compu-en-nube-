@@ -27,11 +27,16 @@ app.use(express.json());
 
 // ==================== RUTAS ====================
 
-// Rutas de salud y monitoreo
+// Rutas de salud y monitoreo (siempre habilitadas)
 app.use('/api/health', healthRoutes);
 
-// Rutas de autenticación
-app.use('/api/auth', authRoutes);
+// Rutas de autenticación (controladas por feature flag)
+if (process.env.FEATURE_AUTH_ENABLED === 'true') {
+  app.use('/api/auth', authRoutes);
+  console.log('✓ Módulo AUTH habilitado');
+} else {
+  console.log('✗ Módulo AUTH deshabilitado (FEATURE_AUTH_ENABLED=false)');
+}
 
 // ==================== SERVIDOR ====================
 
