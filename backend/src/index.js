@@ -10,6 +10,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const healthRoutes = require('../routes/health');
 const authRoutes = require('../routes/auth');
+const usersRoutes = require('../routes/users')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -37,7 +38,12 @@ if (process.env.FEATURE_AUTH_ENABLED === 'true') {
 } else {
   console.log('✗ Módulo AUTH deshabilitado (FEATURE_AUTH_ENABLED=false)');
 }
-
+if (process.env.FEATURE_USERS_ENABLED === 'true') {
+  app.use('/api/users', usersRoutes)
+  console.log('✓ Módulo USERS habilitado')
+} else {
+  console.log('✗ Módulo USERS deshabilitado (FEATURE_USERS_ENABLED=false)')
+}
 // ==================== SERVIDOR ====================
 
 // Iniciar servidor
