@@ -1,0 +1,1942 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+backend/.env.example
+backend/.gitignore
+backend/controllers/.gitkeep
+backend/controllers/authController.js
+backend/controllers/healthController.js
+backend/middlewares/.gitkeep
+backend/models/.gitkeep
+backend/package.json
+backend/routes/.gitkeep
+backend/routes/auth.js
+backend/routes/health.js
+backend/src/config/.gitkeep
+backend/src/index.js
+frontend/env.example
+frontend/index.html
+frontend/package.json
+frontend/src/App.jsx
+frontend/src/assets/styles/global.css
+frontend/src/components/layout/Sidebar.jsx
+frontend/src/components/layout/TopBar.jsx
+frontend/src/components/ui/MonthAccordion.jsx
+frontend/src/components/ui/StatCard.jsx
+frontend/src/components/ui/TaskCard.jsx
+frontend/src/components/ui/TaskModal.jsx
+frontend/src/context/AppContext.jsx
+frontend/src/main.jsx
+frontend/src/pages/Dashboard/DashboardView.jsx
+frontend/src/pages/Settings/SettingsView.jsx
+frontend/src/pages/Tasks/TasksView.jsx
+frontend/src/utils/dateHelpers.js
+frontend/src/utils/mockData.js
+frontend/vite.config.js
+infra/.gitkeep
+readme.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".gitignore">
+# Dependencias
+node_modules/
+
+# Build de producción
+dist/
+
+# Variables de entorno (NUNCA subir al repo)
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+
+# Editor
+.DS_Store
+.vscode/
+</file>
+
+<file path="backend/.env.example">
+# Puerto del servidor
+PORT=5000
+
+# Feature Flags - Controla qué módulos están habilitados
+FEATURE_AUTH_ENABLED=false
+FEATURE_USERS_ENABLED=false
+FEATURE_TASKS_ENABLED=false
+FEATURE_CATEGORIES_ENABLED=false
+FEATURE_TEAMS_ENABLED=false
+FEATURE_NOTIFICATIONS_ENABLED=false
+FEATURE_REPORTS_ENABLED=false
+FEATURE_INTEGRATIONS_ENABLED=false
+
+# Nota: Los módulos deshabilitados no exponen sus endpoints
+# Para desarrollo local, establecer el feature flag correspondiente en true
+</file>
+
+<file path="backend/.gitignore">
+node_modules/
+.env
+</file>
+
+<file path="backend/controllers/.gitkeep">
+
+</file>
+
+<file path="backend/controllers/healthController.js">
+/**
+ * Health Controller
+ * Responsable de monitoreo y salud del servidor
+ * SRP: Solo maneja la lógica de health checks
+ */
+
+/**
+ * Verifica si el servidor está activo (liveness probe)
+ * GET /api/health/liveness
+ */
+const getLiveness = (req, res) => {
+  res.status(200).json({
+    status: 'UP',
+    timestamp: new Date().toISOString()
+  });
+};
+
+/**
+ * Verifica si los servicios dependientes están listos (readiness probe)
+ * GET /api/health/readiness
+ */
+const getReadiness = (req, res) => {
+  // Simulamos estado de conexiones
+  const isDbConnected = true;
+  const isCacheConnected = true;
+
+  if (isDbConnected && isCacheConnected) {
+    return res.status(200).json({
+      isDbConnected,
+      isCacheConnected,
+      status: 'READY',
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  return res.status(503).json({
+    isDbConnected,
+    isCacheConnected,
+    status: 'NOT_READY',
+    timestamp: new Date().toISOString()
+  });
+};
+
+/**
+ * Retorna métricas del sistema
+ * GET /api/health/metrics
+ */
+const getMetrics = (req, res) => {
+  const memoryUsage = process.memoryUsage();
+  const uptime = process.uptime();
+  const cpuUsage = process.cpuUsage();
+
+  res.status(200).json({
+    memory: {
+      rss: `${Math.round(memoryUsage.rss / 1024 / 1024)} MB`,
+      heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
+      heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
+      external: `${Math.round(memoryUsage.external / 1024 / 1024)} MB`
+    },
+    uptime: `${Math.round(uptime)} segundos`,
+    cpu: {
+      user: cpuUsage.user,
+      system: cpuUsage.system
+    },
+    timestamp: new Date().toISOString()
+  });
+};
+
+module.exports = {
+  getLiveness,
+  getReadiness,
+  getMetrics
+};
+</file>
+
+<file path="backend/middlewares/.gitkeep">
+
+</file>
+
+<file path="backend/models/.gitkeep">
+
+</file>
+
+<file path="backend/package.json">
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.1068.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.2.0",
+    "ioredis": "^5.11.1",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^4.0.1",
+    "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
+</file>
+
+<file path="backend/routes/.gitkeep">
+
+</file>
+
+<file path="backend/routes/auth.js">
+/**
+ * Auth Routes
+ * Responsable de mapear endpoints de autenticación
+ * SRP: Solo define las rutas de autenticación
+ */
+
+const express = require('express');
+const router = express.Router();
+const {
+  register,
+  confirm,
+  login,
+  refresh,
+  forgotPassword,
+  resetPassword,
+  logout,
+  setupMFA
+} = require('../controllers/authController');
+
+// Endpoint de registro
+router.post('/register', register);
+
+// Endpoint de confirmación
+router.post('/confirm', confirm);
+
+// Endpoint de login
+router.post('/login', login);
+
+// Endpoint de refresh de token
+router.post('/refresh', refresh);
+
+// Endpoint de forgot password
+router.post('/forgot-password', forgotPassword);
+
+// Endpoint de reset password
+router.post('/reset-password', resetPassword);
+
+// Endpoint de logout
+router.post('/logout', logout);
+
+// Endpoint de setup MFA
+router.post('/mfa/setup', setupMFA);
+
+module.exports = router;
+</file>
+
+<file path="backend/routes/health.js">
+/**
+ * Health Routes
+ * Responsable de mapear endpoints de salud
+ * SRP: Solo define las rutas de health checks
+ */
+
+const express = require('express');
+const router = express.Router();
+const {
+  getLiveness,
+  getReadiness,
+  getMetrics
+} = require('../controllers/healthController');
+
+// Endpoint de liveness probe
+router.get('/liveness', getLiveness);
+
+// Endpoint de readiness probe
+router.get('/readiness', getReadiness);
+
+// Endpoint de métricas del sistema
+router.get('/metrics', getMetrics);
+
+module.exports = router;
+</file>
+
+<file path="backend/src/config/.gitkeep">
+
+</file>
+
+<file path="frontend/env.example">
+# ─────────────────────────────────────────────────────
+#  VARIABLES DE ENTORNO — FRONTEND (Vite)
+#  Copia este archivo como .env y llena los valores
+#  IMPORTANTE: Las variables deben empezar con VITE_
+# ─────────────────────────────────────────────────────
+
+# URL del backend (local durante desarrollo)
+VITE_API_URL=http://localhost:5000
+
+# Amazon Cognito (lo llenas cuando configures Cognito en AWS)
+VITE_COGNITO_USER_POOL_ID=us-east-1_XXXXXXXXX
+VITE_COGNITO_CLIENT_ID=XXXXXXXXXXXXXXXXXXXXXXXXXX
+VITE_COGNITO_DOMAIN=https://grupo4.auth.us-east-1.amazoncognito.com
+VITE_COGNITO_REDIRECT_URI=http://localhost:3000/dashboard
+</file>
+
+<file path="frontend/index.html">
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CloudTask — Grupo 4</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="frontend/package.json">
+{
+  "name": "todo-app-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0"
+  }
+}
+</file>
+
+<file path="frontend/src/App.jsx">
+// ─── App.jsx ──────────────────────────────────────────────────────────────────
+// Raíz de la aplicación Planea.
+// 1. Configura el React Router (Navegación por URL).
+// 2. Inyecta AppProvider (Estado global) solo en las rutas que lo necesitan.
+// 3. Renderiza Sidebar + TopBar + Vista activa + Modal en el Dashboard.
+
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// ─── Contexto ───
+import AppProvider, { useApp } from "./context/AppContext";
+
+// ─── Componentes del Layout ───
+import Sidebar from "./components/layout/Sidebar";
+import TopBar from "./components/layout/TopBar";
+import TaskModal from "./components/ui/TaskModal";
+
+// ─── Vistas Internas ───
+import DashboardView from "./pages/Dashboard/DashboardView";
+import TasksView from "./pages/Tasks/TasksView";
+import SettingsView from "./pages/Settings/SettingsView";
+
+// ─── Estilos ───
+import "./assets/styles/global.css";
+
+// ─── Sub-enrutador Interno (Controlado por AppContext) ────────────────────────
+function MainContent() {
+  const { view } = useApp();
+  
+  if (view === "dashboard") return <DashboardView />;
+  if (view === "ajustes")   return <SettingsView />;
+  return <TasksView />;
+}
+
+// ─── Layout Principal del Dashboard ───────────────────────────────────────────
+function DashboardLayout() {
+  const { darkMode } = useApp();
+
+  return (
+    <div className={`planea-theme-wrapper ${darkMode ? "dark-theme" : "light-theme"}`}>
+      <div className="app">
+        <Sidebar />
+        <main className="mn">
+          <TopBar />
+          <MainContent />
+        </main>
+      </div>
+      <TaskModal />
+    </div>
+  );
+}
+
+// ─── Root con React Router ────────────────────────────────────────────────────
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Redirección automática de la raíz al dashboard */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        
+        {/* Ruta principal del Dashboard envuelta en su Proveedor de Estado */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <AppProvider>
+              <DashboardLayout />
+            </AppProvider>
+          } 
+        />
+
+        {/* Cuando tengas la vista de Login lista, la agregas aquí afuera del AppProvider 
+          para que tenga su propio diseño limpio sin el Sidebar:
+          
+          <Route path="/login" element={<Login />} /> 
+        */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+</file>
+
+<file path="frontend/src/assets/styles/global.css">
+/* ─── global.css ──────────────────────────────────────────────────────────────
+   Estilos globales de Planea App.
+   Importar en App.jsx: import './assets/styles/global.css';
+────────────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { margin: 0; padding: 0; overflow: hidden; font-family: 'Inter', sans-serif; }
+
+/* ─── Wrapper + Variables de Tema ─────────────────────────────────────────── */
+.planea-theme-wrapper {
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  height: 100vh; width: 100vw;
+  background: var(--color-background-primary);
+  display: flex;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.light-theme {
+  --color-background-primary:   #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary:  #f1f5f9;
+  --color-border-primary:       #cbd5e1;
+  --color-border-secondary:     #e2e8f0;
+  --color-border-tertiary:      #f1f5f9;
+  --color-text-primary:         #0f172a;
+  --color-text-secondary:       #475569;
+  --color-text-tertiary:        #64748b;
+  --color-background-info:      #e0f2fe;
+  --color-text-info:            #0284c7;
+  --color-border-info:          #bae6fd;
+  --color-background-success:   #dcfce7;
+  --color-text-success:         #166534;
+  --color-background-danger:    #fee2e2;
+  --color-text-danger:          #991b1b;
+  --color-border-danger:        #fca5a5;
+}
+
+.dark-theme {
+  --color-background-primary:   #0B0F19;
+  --color-background-secondary: #111827;
+  --color-background-tertiary:  #06090F;
+  --color-border-primary:       #334155;
+  --color-border-secondary:     #1e293b;
+  --color-border-tertiary:      #1e293b;
+  --color-text-primary:         #f8fafc;
+  --color-text-secondary:       #cbd5e1;
+  --color-text-tertiary:        #94a3b8;
+  --color-background-info:      #0ea5e920;
+  --color-text-info:            #38bdf8;
+  --color-border-info:          #0ea5e940;
+  --color-background-success:   #22c55e20;
+  --color-text-success:         #4ade80;
+  --color-background-danger:    #ef444420;
+  --color-text-danger:          #f87171;
+  --color-border-danger:        #ef444440;
+}
+
+/* ─── Layout ───────────────────────────────────────────────────────────────── */
+.app { display: flex; width: 100%; height: 100vh; background: var(--color-background-primary); overflow: hidden; }
+
+/* ─── Sidebar ──────────────────────────────────────────────────────────────── */
+.sb {
+  width: 260px; flex-shrink: 0;
+  background: var(--color-background-primary);
+  border-right: 1px solid var(--color-border-tertiary);
+  padding: 24px 18px;
+  display: flex; flex-direction: column; gap: 4px;
+  height: 100vh; overflow-y: auto; overflow-x: hidden;
+  transition: width 0.2s ease, padding 0.2s ease;
+}
+.sb.collapsed { width: 100px; padding: 24px 14px; align-items: center; }
+.sb.collapsed .logo-text,
+.sb.collapsed .slbl,
+.sb.collapsed .ni span,
+.sb.collapsed .bx,
+.sb.collapsed .mc-text { display: none !important; }
+.sb.collapsed .ni { justify-content: center; padding: 12px 0; }
+.sb.collapsed .ni i { margin: 0; font-size: 24px !important; }
+
+/* ─── Main ─────────────────────────────────────────────────────────────────── */
+.mn {
+  flex: 1; background: var(--color-background-tertiary);
+  padding: 36px 48px; min-width: 0;
+  height: 100vh; overflow-y: auto;
+}
+
+/* ─── Nav Item ─────────────────────────────────────────────────────────────── */
+.ni {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: var(--border-radius-sm);
+  cursor: pointer; font-size: 14px; font-weight: 500;
+  color: var(--color-text-secondary);
+  border: none; background: transparent;
+  width: 100%; text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.ni:hover       { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.ni.act         { background: var(--color-background-info); color: var(--color-text-info); font-weight: 600; }
+.ni.dng.act     { background: var(--color-background-danger); color: var(--color-text-danger); }
+
+/* ─── Badge ────────────────────────────────────────────────────────────────── */
+.bx {
+  margin-left: auto; font-size: 12px;
+  padding: 2px 10px; border-radius: 999px;
+  background: var(--color-background-secondary);
+  color: var(--color-text-tertiary); font-weight: 600;
+  transition: background 0.15s;
+}
+.ni.act .bx     { background: var(--color-background-primary); color: var(--color-text-info); }
+.bx.d           { background: var(--color-background-danger); color: var(--color-text-danger); }
+
+/* ─── Section Label ────────────────────────────────────────────────────────── */
+.slbl {
+  font-size: 11px; color: var(--color-text-tertiary);
+  letter-spacing: 1px; padding: 18px 14px 6px;
+  text-transform: uppercase; font-weight: 700; width: 100%;
+}
+
+/* ─── Stat Card ────────────────────────────────────────────────────────────── */
+.sc {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 24px 28px; cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.sc:hover {
+  border-color: var(--color-border-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+}
+
+/* ─── Task Card ────────────────────────────────────────────────────────────── */
+.tc {
+  display: flex; flex-direction: column;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 20px 24px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.tc:hover {
+  border-color: var(--color-border-secondary);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
+}
+
+/* ─── Date Button (Dashboard) ──────────────────────────────────────────────── */
+.db {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; padding: 14px 18px;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer; min-width: 85px;
+  transition: border-color 0.2s;
+}
+.db:hover { border-color: var(--color-border-secondary); }
+.db.act   { background: var(--color-background-info); border-color: var(--color-border-info); }
+
+/* ─── Chip ─────────────────────────────────────────────────────────────────── */
+.chip {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+}
+
+/* ─── Action Buttons ───────────────────────────────────────────────────────── */
+.action-btn {
+  width: 32px; height: 32px; border: none;
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.action-btn:hover          { background: var(--color-background-info);   color: var(--color-text-info); }
+.action-btn.del-btn:hover  { background: var(--color-background-danger);  color: var(--color-text-danger); }
+
+/* ─── Search Input ─────────────────────────────────────────────────────────── */
+.search-input {
+  padding: 10px 14px 10px 36px; width: 220px;
+  font-size: 14px; border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary); outline: none;
+  transition: width 0.3s, border-color 0.2s;
+}
+.search-input:focus { border-color: var(--color-text-info); width: 280px; }
+
+/* ─── Primary Button ───────────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  border: 1px solid var(--color-border-info);
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 20px; font-size: 14px; font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer; white-space: nowrap;
+  transition: filter 0.2s, transform 0.2s;
+}
+.btn-primary:hover { filter: brightness(0.95); transform: translateY(-1px); }
+
+/* ─── Settings ─────────────────────────────────────────────────────────────── */
+.ajustes-section {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 28px; display: flex; flex-direction: column; gap: 24px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+
+.theme-switch {
+  display: flex; background: var(--color-background-tertiary);
+  padding: 4px; border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border-secondary); width: max-content;
+}
+.theme-btn {
+  padding: 10px 20px; display: flex; align-items: center; gap: 8px;
+  border-radius: var(--border-radius-sm); border: none;
+  background: transparent; color: var(--color-text-secondary);
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.theme-btn:hover:not(.active) { color: var(--color-text-primary); }
+.theme-btn.active {
+  background: var(--color-background-primary); color: var(--color-text-info);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid var(--color-border-primary);
+}
+
+/* ─── Sub Tabs (vistas de categoría) ──────────────────────────────────────── */
+.sub-tab {
+  padding: 8px 18px; border-radius: 999px;
+  font-size: 13px; font-weight: 600;
+  color: var(--color-text-secondary);
+  background: transparent; border: 1px solid var(--color-border-primary);
+  cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.sub-tab:hover { border-color: var(--color-text-info); color: var(--color-text-info); }
+.sub-tab.act   { background: var(--color-background-info); border-color: var(--color-border-info); color: var(--color-text-info); }
+
+/* ─── Month Header (acordeón) ──────────────────────────────────────────────── */
+.month-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  padding: 12px 18px; border-radius: var(--border-radius-md);
+  margin-top: 24px; margin-bottom: 16px;
+  cursor: pointer; user-select: none; transition: border-color 0.2s;
+}
+.month-header:hover { border-color: var(--color-border-primary); }
+.month-header h3 {
+  font-size: 14px; font-weight: 700; color: var(--color-text-primary);
+  text-transform: uppercase; letter-spacing: 1px; margin: 0;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ─── Modal ────────────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.modal-content {
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: 32px; width: 480px; max-width: 90vw;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  margin: auto;
+}
+
+/* ─── Form ─────────────────────────────────────────────────────────────────── */
+.form-label {
+  display: block; font-size: 12px; font-weight: 700;
+  color: var(--color-text-tertiary); text-transform: uppercase;
+  margin-bottom: 8px; letter-spacing: 0.5px;
+}
+.form-input {
+  width: 100%; padding: 12px 14px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  margin-bottom: 18px; font-family: inherit;
+  font-size: 14px; outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--color-text-info); }
+
+/* ─── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-primary); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
+</file>
+
+<file path="frontend/src/components/layout/Sidebar.jsx">
+// ─── Sidebar.jsx ──────────────────────────────────────────────────────────────
+// Sidebar colapsable. Contiene: logo, nav principal, categorías, ajustes y cuenta.
+// Se colapsa a 100px mostrando solo íconos.
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { CAT_COLOR, CAT_ICON } from "../../utils/mockData";
+
+export default function Sidebar() {
+  const {
+    view, category,
+    isSidebarCollapsed, setIsSidebarCollapsed,
+    total, doneN, pendN, overdueN,
+    go, goCat,
+  } = useApp();
+
+  return (
+    <aside className={`sb ${isSidebarCollapsed ? "collapsed" : ""}`}>
+
+      {/* ─ Logo + botón colapsar ─ */}
+      <div style={{ display: "flex", flexDirection: isSidebarCollapsed ? "column" : "row", alignItems: "center", justifyContent: isSidebarCollapsed ? "center" : "space-between", marginBottom: "32px", padding: "4px 8px", width: "100%", gap: isSidebarCollapsed ? "16px" : "0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ width: "38px", height: "38px", background: "var(--color-background-info)", borderRadius: "var(--border-radius-sm)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <i className="ti ti-check-square" style={{ fontSize: "22px", color: "var(--color-text-info)" }}></i>
+          </div>
+          <div className="logo-text">
+            <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--color-text-primary)", letterSpacing: "-0.5px" }}>Planea</div>
+          </div>
+        </div>
+        <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} style={{ background: "transparent", border: "none", color: "var(--color-text-tertiary)", cursor: "pointer", display: "flex", padding: "4px" }}>
+          <i className={`ti ${isSidebarCollapsed ? "ti-layout-sidebar-right-expand" : "ti-layout-sidebar-left-collapse"}`} style={{ fontSize: "22px" }}></i>
+        </button>
+      </div>
+
+      {/* ─ Dashboard ─ */}
+      <button className={`ni ${view === "dashboard" ? "act" : ""}`} onClick={() => go("dashboard")} title="Dashboard">
+        <i className="ti ti-layout-dashboard" style={{ fontSize: "18px" }}></i>
+        <span>Dashboard</span>
+      </button>
+
+      {/* ─ Mis Tareas ─ */}
+      <div className="slbl">Mis tareas</div>
+      <button className={`ni ${view === "todas" && !category ? "act" : ""}`} onClick={() => go("todas")} title="Todas">
+        <i className="ti ti-list" style={{ fontSize: "18px" }}></i>
+        <span>Todas</span>
+        <span className="bx">{total}</span>
+      </button>
+      <button className={`ni ${view === "pendientes" && !category ? "act" : ""}`} onClick={() => go("pendientes")} title="Pendientes">
+        <i className="ti ti-circle-dashed" style={{ fontSize: "18px" }}></i>
+        <span>Pendientes</span>
+        <span className="bx">{pendN}</span>
+      </button>
+      <button className={`ni ${view === "completadas" && !category ? "act" : ""}`} onClick={() => go("completadas")} title="Completadas">
+        <i className="ti ti-circle-check" style={{ fontSize: "18px" }}></i>
+        <span>Completadas</span>
+        <span className="bx">{doneN}</span>
+      </button>
+      <button
+        className={`ni ${view === "vencidas" && !category ? "act dng" : ""} ${view !== "vencidas" && overdueN > 0 && !category ? "dng" : ""}`}
+        onClick={() => go("vencidas")} title="Vencidas"
+      >
+        <i className="ti ti-alert-triangle" style={{ fontSize: "18px" }}></i>
+        <span>Vencidas</span>
+        <span className={`bx ${overdueN > 0 ? "d" : ""}`}>{overdueN}</span>
+      </button>
+
+      {/* ─ Mis Categorías ─ */}
+      <div className="slbl">Mis categorías</div>
+      {Object.entries(CAT_COLOR).map(([name, color]) => (
+        <button key={name} className={`ni ${category === name ? "act" : ""}`} onClick={() => goCat(name)} title={name}>
+          <i className={`ti ${CAT_ICON[name]}`} style={{ fontSize: "18px", color }} />
+          <span>{name}</span>
+        </button>
+      ))}
+
+      {/* ─ Footer: Ajustes + Cuenta ─ */}
+      <div style={{ marginTop: "auto", borderTop: "1px solid var(--color-border-tertiary)", paddingTop: "16px", width: "100%" }}>
+        <button className={`ni ${view === "ajustes" ? "act" : ""}`} onClick={() => go("ajustes")} title="Ajustes">
+          <i className="ti ti-settings" style={{ fontSize: "18px" }}></i>
+          <span>Ajustes</span>
+        </button>
+        <button className="ni" onClick={() => go("ajustes")}
+          style={{ background: "var(--color-background-secondary)", border: "1px solid var(--color-border-tertiary)", borderRadius: "var(--border-radius-sm)", marginTop: "10px", gap: "12px", padding: "12px" }}
+          title="Mi cuenta"
+        >
+          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--color-background-info)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, color: "var(--color-text-info)", flexShrink: 0 }}>MC</div>
+          <div className="mc-text" style={{ flex: 1, textAlign: "left" }}>
+            <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--color-text-primary)" }}>Mi cuenta</div>
+            <div style={{ fontSize: "11px", color: "var(--color-text-secondary)" }}>Personal</div>
+          </div>
+          <i className="ti ti-chevron-right mc-text" style={{ fontSize: "16px", color: "var(--color-text-tertiary)" }}></i>
+        </button>
+      </div>
+    </aside>
+  );
+}
+</file>
+
+<file path="frontend/src/components/layout/TopBar.jsx">
+// ─── TopBar.jsx ───────────────────────────────────────────────────────────────
+// Encabezado de la vista activa: título dinámico, fecha, búsqueda y botón "Nueva tarea".
+// El buscador solo aparece en vistas de listado (no dashboard ni ajustes).
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { VT } from "../../utils/mockData";
+
+export default function TopBar() {
+  const { view, category, search, setSearch, openAdd, dayLabel, showSearch } = useApp();
+
+  const title = category ? `Categoría: ${category}` : VT[view] || "Dashboard";
+
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "32px" }}>
+      <div>
+        <div style={{ fontSize: "26px", fontWeight: 700, color: "var(--color-text-primary)", marginBottom: "6px", letterSpacing: "-0.5px" }}>
+          {title}
+        </div>
+        <div style={{ fontSize: "13px", color: "var(--color-text-tertiary)", fontWeight: 500 }}>
+          {dayLabel}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
+        {showSearch && (
+          <div style={{ position: "relative" }}>
+            <i className="ti ti-search" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "16px", color: "var(--color-text-tertiary)" }}></i>
+            <input className="search-input" placeholder="Buscar tareas..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+        )}
+        <button className="btn-primary" onClick={openAdd}>
+          <i className="ti ti-plus" style={{ fontSize: "16px" }}></i>
+          Nueva tarea
+        </button>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="frontend/src/components/ui/MonthAccordion.jsx">
+// ─── MonthAccordion.jsx ───────────────────────────────────────────────────────
+// Grupo colapsable de tareas por mes. El mes actual viene abierto por defecto.
+// Props: mk (string "YYYY-MM"), tasks (array de tareas del mes)
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { monthLabel } from "../../utils/dateHelpers";
+import TaskCard from "./TaskCard";
+
+export default function MonthAccordion({ mk, tasks }) {
+  const { isMonthCollapsed, toggleMonth } = useApp();
+  const collapsed = isMonthCollapsed(mk);
+
+  return (
+    <div>
+      <div className="month-header" onClick={() => toggleMonth(mk)}>
+        <h3>
+          <i className="ti ti-calendar-event" style={{ fontSize: "18px", color: "var(--color-text-info)" }}></i>
+          {monthLabel(mk)}
+        </h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <span style={{ fontSize: "11px", color: "var(--color-text-secondary)", fontWeight: 600 }}>
+            {tasks.length} tareas
+          </span>
+          <i className={`ti ti-chevron-${collapsed ? "down" : "up"}`} style={{ color: "var(--color-text-tertiary)" }}></i>
+        </div>
+      </div>
+
+      {!collapsed && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
+          {tasks.map((t) => <TaskCard key={t.id} t={t} />)}
+        </div>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="frontend/src/components/ui/StatCard.jsx">
+// ─── StatCard.jsx ─────────────────────────────────────────────────────────────
+// Tarjeta clickeable de estadística. Al hacer clic navega a la vista correspondiente.
+// Props: lbl, num, sub, colVar (CSS var string), filterGo (view name)
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+
+export default function StatCard({ lbl, num, sub, colVar, filterGo }) {
+  const { go } = useApp();
+
+  return (
+    <div className="sc" onClick={() => go(filterGo)}>
+      <div style={{ fontSize: "11px", color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: ".8px", fontWeight: 600, marginBottom: "8px" }}>
+        {lbl}
+      </div>
+      <div style={{ fontSize: "36px", fontWeight: 600, color: colVar, lineHeight: 1, marginBottom: "5px" }}>
+        {String(num).padStart(2, "0")}
+      </div>
+      <div style={{ fontSize: "12px", color: "var(--color-text-tertiary)", marginBottom: "12px" }}>
+        {sub}
+      </div>
+      <div style={{ fontSize: "12px", color: "var(--color-text-info)", display: "flex", alignItems: "center", gap: "4px", fontWeight: 500 }}>
+        <span>Ver tareas</span>
+        <i className="ti ti-arrow-right" style={{ fontSize: "12px" }}></i>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="frontend/src/components/ui/TaskCard.jsx">
+// ─── TaskCard.jsx ─────────────────────────────────────────────────────────────
+// Tarjeta de tarea individual. Acciones: completar, editar, eliminar.
+// Props: t (objeto tarea)
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { CAT_COLOR, CAT_ICON } from "../../utils/mockData";
+import { fmtDateStr, getBucket } from "../../utils/dateHelpers";
+
+export default function TaskCard({ t }) {
+  const { toggleTask, openEdit, deleteTask } = useApp();
+
+  return (
+    <div className="tc" style={{ borderLeft: `4px solid ${CAT_COLOR[t.category]}`, opacity: t.completed ? 0.6 : 1 }}>
+
+      {/* ─ Chips de categoría y estado ─ */}
+      <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "12px" }}>
+        <span className="chip" style={{ background: `${CAT_COLOR[t.category]}20`, color: CAT_COLOR[t.category] }}>
+          <i className={`ti ${CAT_ICON[t.category] || "ti-tag"}`} style={{ fontSize: "12px", marginRight: "4px" }}></i>
+          {t.category}
+        </span>
+        {t.completed && (
+          <span className="chip" style={{ background: "var(--color-background-success)", color: "var(--color-text-success)", marginLeft: "auto" }}>
+            <i className="ti ti-check" style={{ fontSize: "11px", marginRight: "3px" }}></i>Hecho
+          </span>
+        )}
+        {!t.completed && getBucket(t.dueDate) === "vencidas" && (
+          <span className="chip" style={{ background: "var(--color-background-danger)", color: "var(--color-text-danger)", marginLeft: "auto" }}>
+            <i className="ti ti-alert-triangle" style={{ fontSize: "11px", marginRight: "3px" }}></i>Vencida
+          </span>
+        )}
+      </div>
+
+      {/* ─ Título y notas ─ */}
+      <div style={{ fontSize: "15px", fontWeight: 600, color: t.completed ? "var(--color-text-tertiary)" : "var(--color-text-primary)", textDecoration: t.completed ? "line-through" : "none", marginBottom: "6px", lineHeight: 1.4 }}>
+        {t.title}
+      </div>
+      <div style={{ fontSize: "13px", color: "var(--color-text-secondary)", marginBottom: "16px", lineHeight: 1.5 }}>
+        {t.notes}
+      </div>
+
+      {/* ─ Footer: fecha + botones ─ */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
+        <span style={{ fontSize: "12px", color: "var(--color-text-tertiary)", display: "flex", alignItems: "center", gap: "5px" }}>
+          <i className="ti ti-calendar" style={{ fontSize: "14px" }}></i>
+          {fmtDateStr(t.dueDate)}
+        </span>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button onClick={() => toggleTask(t.id)} className="action-btn" title={t.completed ? "Desmarcar" : "Completar"}>
+            <i className={t.completed ? "ti ti-arrow-back-up" : "ti ti-check"} style={{ fontSize: "15px" }}></i>
+          </button>
+          <button onClick={() => openEdit(t)} className="action-btn">
+            <i className="ti ti-edit" style={{ fontSize: "15px" }}></i>
+          </button>
+          <button onClick={() => deleteTask(t.id)} className="action-btn del-btn">
+            <i className="ti ti-trash" style={{ fontSize: "15px" }}></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="frontend/src/components/ui/TaskModal.jsx">
+// ─── TaskModal.jsx ────────────────────────────────────────────────────────────
+// Modal de creación y edición de tareas. Se activa desde openAdd() u openEdit().
+// No recibe props: lee y escribe todo desde AppContext.
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { CAT_COLOR } from "../../utils/mockData";
+
+export default function TaskModal() {
+  const {
+    showModal, setModal,
+    editId, fTitle, setFTitle, fDate, setFDate, fNotes, setFNotes, fCat, setFCat,
+    saveTask,
+  } = useApp();
+
+  if (!showModal) return null;
+
+  return (
+    <div className="modal-overlay" onClick={() => setModal(false)}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+
+        {/* ─ Encabezado ─ */}
+        <div style={{ fontSize: "20px", fontWeight: 700, color: "var(--color-text-primary)", marginBottom: "26px", display: "flex", alignItems: "center", gap: "10px" }}>
+          <i className={editId !== null ? "ti ti-pencil" : "ti ti-plus"} style={{ color: "var(--color-text-info)" }}></i>
+          {editId !== null ? "Editar tarea" : "Nueva tarea"}
+        </div>
+
+        {/* ─ Título ─ */}
+        <div>
+          <label className="form-label">Título de la tarea</label>
+          <input className="form-input" placeholder="Ej: Comprar el pan..." value={fTitle} autoFocus
+            onChange={(e) => setFTitle(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && saveTask()}
+          />
+        </div>
+
+        {/* ─ Fecha + Categoría ─ */}
+        <div style={{ display: "flex", gap: "16px" }}>
+          <div style={{ flex: 1 }}>
+            <label className="form-label">Fecha límite</label>
+            <input type="date" className="form-input" value={fDate} onChange={(e) => setFDate(e.target.value)} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label className="form-label">Categoría</label>
+            <select className="form-input" value={fCat} onChange={(e) => setFCat(e.target.value)}>
+              {Object.keys(CAT_COLOR).map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* ─ Notas ─ */}
+        <div>
+          <label className="form-label">Notas o detalles</label>
+          <textarea className="form-input" placeholder="Agrega información adicional..." value={fNotes}
+            onChange={(e) => setFNotes(e.target.value)} style={{ resize: "vertical", minHeight: "90px" }}
+          />
+        </div>
+
+        {/* ─ Botones ─ */}
+        <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
+          <button onClick={() => setModal(false)} style={{ flex: 1, padding: "12px", background: "var(--color-background-secondary)", border: "1px solid var(--color-border-primary)", borderRadius: "var(--border-radius-sm)", color: "var(--color-text-secondary)", fontWeight: 600, cursor: "pointer" }}>
+            Cancelar
+          </button>
+          <button onClick={saveTask} style={{ flex: 2, padding: "12px", background: "var(--color-background-info)", border: "1px solid var(--color-border-info)", borderRadius: "var(--border-radius-sm)", color: "var(--color-text-info)", fontWeight: 700, cursor: "pointer" }}>
+            {editId !== null ? "Guardar cambios" : "Crear Tarea"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="frontend/src/context/AppContext.jsx">
+// ─── AppContext.jsx ───────────────────────────────────────────────────────────
+// Estado global de Planea: navegación, tareas, filtros, modal y UI.
+// Expone todo vía useApp() — ningún componente maneja estado local relevante.
+
+import React, { createContext, useContext, useState } from "react";
+import { INIT_TASKS } from "../utils/mockData";
+import { addDays, getBucket, getMonthKey } from "../utils/dateHelpers";
+
+const AppContext = createContext(null);
+export const useApp = () => useContext(AppContext);
+
+export default function AppProvider({ children }) {
+  // ── Navegación ──────────────────────────────────────────────────────────────
+  const [view, setView]             = useState("dashboard");
+  const [category, setCategory]     = useState(null);
+  const [dateFilter, setDateFilter] = useState("todas");
+  const [showMonths, setShowMonths] = useState(false);
+
+  // ── UI ──────────────────────────────────────────────────────────────────────
+  const [darkMode, setDarkMode]                     = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [search, setSearch]                         = useState("");
+  const [collapsedOverrides, setCollapsedOverrides] = useState({});
+
+  // ── Tareas ──────────────────────────────────────────────────────────────────
+  const [tasks, setTasks] = useState(INIT_TASKS);
+
+  // ── Modal ───────────────────────────────────────────────────────────────────
+  const [showModal, setModal] = useState(false);
+  const [editId, setEditId]   = useState(null);
+  const [fTitle, setFTitle]   = useState("");
+  const [fDate, setFDate]     = useState("");
+  const [fNotes, setFNotes]   = useState("");
+  const [fCat, setFCat]       = useState("Personal");
+
+  // ── Stats globales ──────────────────────────────────────────────────────────
+  const total    = tasks.length;
+  const doneN    = tasks.filter((t) => t.completed).length;
+  const pendN    = tasks.filter((t) => !t.completed).length;
+  const overdueN = tasks.filter((t) => getBucket(t.dueDate) === "vencidas" && !t.completed).length;
+
+  // ── Stats por categoría ─────────────────────────────────────────────────────
+  const catTasks = category ? tasks.filter((t) => t.category === category) : [];
+  const catTotal = catTasks.length;
+  const catDone  = catTasks.filter((t) => t.completed).length;
+  const catPend  = catTasks.filter((t) => !t.completed).length;
+  const catOver  = catTasks.filter((t) => getBucket(t.dueDate) === "vencidas" && !t.completed).length;
+
+  // ── Filtrado ────────────────────────────────────────────────────────────────
+  let filtered = [...tasks];
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(
+      (t) => t.title.toLowerCase().includes(q) || t.notes.toLowerCase().includes(q)
+    );
+  }
+  if (category)             filtered = filtered.filter((t) => t.category === category);
+  if (view === "pendientes") filtered = filtered.filter((t) => !t.completed);
+  if (view === "completadas") filtered = filtered.filter((t) => t.completed);
+  if (view === "vencidas")   filtered = filtered.filter((t) => getBucket(t.dueDate) === "vencidas" && !t.completed);
+  if (view === "dashboard" && dateFilter !== "todas" && dateFilter !== "meses") {
+    if (dateFilter.length > 6) {
+      filtered = filtered.filter((t) => getMonthKey(t.dueDate) === dateFilter);
+    } else {
+      filtered = filtered.filter((t) => getBucket(t.dueDate) === dateFilter);
+    }
+  }
+
+  // ── Agrupado por mes ────────────────────────────────────────────────────────
+  const groupedTasks = {};
+  filtered.forEach((t) => {
+    const mk = getMonthKey(t.dueDate);
+    if (!groupedTasks[mk]) groupedTasks[mk] = [];
+    groupedTasks[mk].push(t);
+  });
+
+  const todayDate       = new Date();
+  const currentMonthKey = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, "0")}`;
+
+  const sortedMonthKeys = Object.keys(groupedTasks).sort((a, b) => {
+    if (a === "0000-00") return 1;
+    if (b === "0000-00") return -1;
+    const isAPast = a < currentMonthKey;
+    const isBPast = b < currentMonthKey;
+    if (isAPast && !isBPast) return 1;
+    if (!isAPast && isBPast) return -1;
+    if (isAPast && isBPast)  return b.localeCompare(a);
+    return a.localeCompare(b);
+  });
+
+  const recentTasks = [...tasks].filter((t) => !t.completed).slice(0, 3);
+
+  // ── Acordeón inteligente ────────────────────────────────────────────────────
+  const isMonthCollapsed = (mk) => {
+    if (collapsedOverrides[mk] !== undefined) return collapsedOverrides[mk];
+    return mk !== currentMonthKey; // Por defecto: solo el mes actual está abierto
+  };
+  const toggleMonth = (mk) => {
+    setCollapsedOverrides((prev) => ({
+      ...prev,
+      [mk]: prev[mk] !== undefined ? !prev[mk] : mk === currentMonthKey ? true : false,
+    }));
+  };
+
+  // ── Acciones de navegación ──────────────────────────────────────────────────
+  const go    = (v) => { setView(v); setCategory(null); setDateFilter("todas"); };
+  const goCat = (c) => { setCategory(c); setView("todas"); setDateFilter("todas"); };
+  const setDF = (f) => {
+    if (f === "meses") { setShowMonths(!showMonths); return; }
+    setDateFilter(f);
+  };
+
+  // ── CRUD de tareas ──────────────────────────────────────────────────────────
+  const toggleTask = (id) => setTasks(tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t));
+  const deleteTask = (id) => setTasks(tasks.filter((t) => t.id !== id));
+  const openAdd    = () => { setEditId(null); setFTitle(""); setFDate(addDays(0)); setFNotes(""); setFCat("Personal"); setModal(true); };
+  const openEdit   = (t) => { setEditId(t.id); setFTitle(t.title); setFDate(t.dueDate || addDays(0)); setFNotes(t.notes); setFCat(t.category); setModal(true); };
+  const saveTask   = () => {
+    if (!fTitle.trim()) return;
+    if (editId !== null) {
+      setTasks(tasks.map((t) => t.id === editId ? { ...t, title: fTitle, dueDate: fDate, notes: fNotes, category: fCat } : t));
+    } else {
+      setTasks([{ id: Date.now(), title: fTitle, dueDate: fDate, notes: fNotes, category: fCat, completed: false }, ...tasks]);
+    }
+    setModal(false);
+  };
+
+  // ── Misc ────────────────────────────────────────────────────────────────────
+  const dayLabel   = new Date().toLocaleDateString("es-CL", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  const handleLogout = () => alert("Cerrando sesión de usuario...");
+  const showSearch   = view !== "ajustes" && view !== "dashboard";
+
+  // ── Valor del contexto ──────────────────────────────────────────────────────
+  const value = {
+    // Estado de navegación
+    view, setView, category, dateFilter, showMonths,
+    // Estado de UI
+    darkMode, setDarkMode, isSidebarCollapsed, setIsSidebarCollapsed,
+    search, setSearch,
+    // Estado del modal
+    showModal, setModal, editId,
+    fTitle, setFTitle, fDate, setFDate, fNotes, setFNotes, fCat, setFCat,
+    // Stats
+    total, doneN, pendN, overdueN,
+    catTotal, catDone, catPend, catOver,
+    // Datos derivados
+    filtered, groupedTasks, sortedMonthKeys, recentTasks, currentMonthKey,
+    // Funciones de acordeón
+    isMonthCollapsed, toggleMonth,
+    // Acciones
+    go, goCat, setDF, toggleTask, deleteTask, openAdd, openEdit, saveTask,
+    handleLogout, dayLabel, showSearch,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+}
+</file>
+
+<file path="frontend/src/main.jsx">
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+</file>
+
+<file path="frontend/src/pages/Dashboard/DashboardView.jsx">
+// ─── DashboardView.jsx ────────────────────────────────────────────────────────
+// Vista del Dashboard. Contiene: StatCards, selector de fecha (Hoy/Mañana/Meses)
+// y la grilla de tareas recientes o filtradas por fecha.
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { ALL_MONTHS } from "../../utils/mockData";
+import { monthLabel } from "../../utils/dateHelpers";
+import StatCard from "../../components/ui/StatCard";
+import TaskCard from "../../components/ui/TaskCard";
+
+export default function DashboardView() {
+  const { total, doneN, pendN, dateFilter, setDF, showMonths, filtered, recentTasks } = useApp();
+
+  const sectionLabel = () => {
+    if (dateFilter === "todas" || dateFilter === "meses") return "Tareas Recientes y Pendientes";
+    if (dateFilter === "hoy")    return "Tareas de Hoy";
+    if (dateFilter === "manana") return "Tareas de Mañana";
+    return `Tareas de ${monthLabel(dateFilter)}`;
+  };
+
+  const displayTasks = (dateFilter === "todas" || dateFilter === "meses") ? recentTasks : filtered;
+
+  return (
+    <>
+      {/* ─ Stat Cards ─ */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "20px", marginBottom: "32px" }}>
+        <StatCard lbl="Total de tareas" num={total} sub="En tu lista"                                               colVar="var(--color-text-primary)"  filterGo="todas"       />
+        <StatCard lbl="Completadas"     num={doneN} sub={`${Math.round(total ? doneN / total * 100 : 0)}% del total`} colVar="var(--color-text-success)"  filterGo="completadas" />
+        <StatCard lbl="Pendientes"      num={pendN} sub="Por completar"                                              colVar="var(--color-text-info)"     filterGo="pendientes"  />
+      </div>
+
+      {/* ─ Navegador de Fecha ─ */}
+      <div style={{ marginBottom: "32px" }}>
+        <div style={{ fontSize: "11px", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700, marginBottom: "16px" }}>
+          Navegar por fecha
+        </div>
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          {[{ id: "hoy", ic: "ti-sun", lb: "Hoy" }, { id: "manana", ic: "ti-sunset-2", lb: "Mañana" }].map((d) => (
+            <button key={d.id} className={`db ${dateFilter === d.id && !showMonths ? "act" : ""}`} onClick={() => setDF(d.id)}>
+              <i className={`ti ${d.ic}`} style={{ fontSize: "22px", color: dateFilter === d.id && !showMonths ? "var(--color-text-info)" : "var(--color-text-secondary)" }}></i>
+              <span style={{ fontSize: "12px", fontWeight: 600, color: dateFilter === d.id && !showMonths ? "var(--color-text-info)" : "var(--color-text-secondary)", marginTop: "4px" }}>{d.lb}</span>
+            </button>
+          ))}
+          <button className={`db ${showMonths ? "act" : ""}`} onClick={() => setDF("meses")}>
+            <i className="ti ti-calendar-month" style={{ fontSize: "22px", color: showMonths ? "var(--color-text-info)" : "var(--color-text-secondary)" }}></i>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: showMonths ? "var(--color-text-info)" : "var(--color-text-secondary)", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
+              Meses <i className={`ti ti-chevron-${showMonths ? "up" : "down"}`} style={{ fontSize: "12px" }}></i>
+            </span>
+          </button>
+        </div>
+
+        {/* Grid expandible de 12 meses */}
+        <div style={{ display: showMonths ? "grid" : "none", gridTemplateColumns: "repeat(6, 1fr)", gap: "12px", marginTop: "16px", padding: "16px", background: "var(--color-background-primary)", borderRadius: "var(--border-radius-lg)", border: "1px solid var(--color-border-tertiary)" }}>
+          {ALL_MONTHS.map((m) => (
+            <button key={m} className={`db ${dateFilter === m ? "act" : ""}`} onClick={() => setDF(m)} style={{ minWidth: "0" }}>
+              <i className="ti ti-calendar" style={{ fontSize: "18px", color: dateFilter === m ? "var(--color-text-info)" : "var(--color-text-secondary)" }}></i>
+              <span style={{ fontSize: "11px", fontWeight: 600, color: dateFilter === m ? "var(--color-text-info)" : "var(--color-text-secondary)", marginTop: "4px" }}>
+                {new Date(m + "-01T00:00:00").toLocaleDateString("es-CL", { month: "short" }).toUpperCase()}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ─ Tareas ─ */}
+      <div>
+        <div style={{ fontSize: "11px", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700, marginBottom: "16px" }}>
+          {sectionLabel()}
+        </div>
+        {displayTasks.length === 0 ? (
+          <div style={{ fontSize: "13px", color: "var(--color-text-tertiary)" }}>No hay tareas para esta selección.</div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
+            {displayTasks.map((t) => <TaskCard key={t.id} t={t} />)}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+</file>
+
+<file path="frontend/src/pages/Settings/SettingsView.jsx">
+// ─── SettingsView.jsx ─────────────────────────────────────────────────────────
+// Vista de Ajustes del Sistema.
+// Secciones: Personalización Visual · Perfil y Cuenta · Zona de Peligro
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+
+export default function SettingsView() {
+  const { darkMode, setDarkMode, handleLogout } = useApp();
+
+  return (
+    <div style={{ maxWidth: "640px", margin: "0 auto", width: "100%", paddingTop: "10px" }}>
+      <div style={{ marginBottom: "32px" }}>
+        <h2 style={{ color: "var(--color-text-primary)", fontSize: "24px", marginBottom: "8px", fontWeight: 700 }}>
+          Configuración del Sistema
+        </h2>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "14px" }}>
+          Administra tus preferencias de la interfaz y tu cuenta personal.
+        </p>
+      </div>
+
+      {/* ─ Personalización Visual ─ */}
+      <div className="ajustes-section" style={{ marginBottom: "24px" }}>
+        <div style={{ fontSize: "12px", color: "var(--color-text-info)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700, borderBottom: "1px solid var(--color-border-tertiary)", paddingBottom: "12px" }}>
+          Personalización Visual
+        </div>
+        <div className="setting-row">
+          <div>
+            <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--color-text-primary)", marginBottom: "4px" }}>Modo de interfaz</div>
+            <div style={{ fontSize: "13px", color: "var(--color-text-tertiary)" }}>Elige tu esquema de colores preferido.</div>
+          </div>
+          <div className="theme-switch">
+            <button onClick={() => setDarkMode(false)} className={`theme-btn ${!darkMode ? "active" : ""}`}>
+              <i className="ti ti-sun" style={{ fontSize: "18px" }}></i> Claro
+            </button>
+            <button onClick={() => setDarkMode(true)} className={`theme-btn ${darkMode ? "active" : ""}`}>
+              <i className="ti ti-moon" style={{ fontSize: "18px" }}></i> Oscuro
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ─ Perfil y Cuenta ─ */}
+      <div className="ajustes-section" style={{ marginBottom: "24px" }}>
+        <div style={{ fontSize: "12px", color: "var(--color-text-info)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700, borderBottom: "1px solid var(--color-border-tertiary)", paddingBottom: "12px" }}>
+          Perfil y Cuenta
+        </div>
+        <div className="setting-row">
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "var(--color-background-info)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", fontWeight: 700, color: "var(--color-text-info)" }}>MC</div>
+            <div>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--color-text-primary)" }}>Mi cuenta</div>
+              <div style={{ fontSize: "13px", color: "var(--color-text-secondary)", marginTop: "4px" }}>Planea · v1.0 Personal</div>
+            </div>
+          </div>
+          <button style={{ background: "var(--color-background-secondary)", border: "1px solid var(--color-border-primary)", padding: "8px 16px", borderRadius: "var(--border-radius-sm)", cursor: "pointer", color: "var(--color-text-secondary)", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" }}>
+            <i className="ti ti-pencil" style={{ fontSize: "16px" }}></i> Editar perfil
+          </button>
+        </div>
+      </div>
+
+      {/* ─ Zona de Peligro ─ */}
+      <div className="ajustes-section" style={{ border: "1px solid var(--color-border-danger)" }}>
+        <div style={{ fontSize: "12px", color: "var(--color-text-danger)", textTransform: "uppercase", letterSpacing: "1px", fontWeight: 700, borderBottom: "1px solid var(--color-border-danger)", paddingBottom: "12px" }}>
+          Zona de peligro
+        </div>
+        <div className="setting-row">
+          <div>
+            <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--color-text-primary)", marginBottom: "4px" }}>Cerrar sesión</div>
+            <div style={{ fontSize: "13px", color: "var(--color-text-tertiary)" }}>Finalizar la sesión activa en este dispositivo.</div>
+          </div>
+          <button onClick={handleLogout} style={{ padding: "10px 20px", display: "flex", alignItems: "center", gap: "8px", borderRadius: "var(--border-radius-sm)", background: "var(--color-background-danger)", border: "1px solid var(--color-border-danger)", color: "var(--color-text-danger)", cursor: "pointer", fontSize: "14px", fontWeight: 700 }}>
+            <i className="ti ti-logout" style={{ fontSize: "18px" }}></i> Salir
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="frontend/src/pages/Tasks/TasksView.jsx">
+// ─── TasksView.jsx ────────────────────────────────────────────────────────────
+// Vista de listados agrupados por mes. Se usa para todas las vistas de tareas
+// excepto Dashboard y Ajustes. Incluye sub-tabs cuando hay categoría activa.
+
+import React from "react";
+import { useApp } from "../../context/AppContext";
+import { VT } from "../../utils/mockData";
+import MonthAccordion from "../../components/ui/MonthAccordion";
+
+export default function TasksView() {
+  const {
+    view, setView, category,
+    filtered, groupedTasks, sortedMonthKeys,
+    catTotal, catDone, catPend, catOver,
+    search,
+  } = useApp();
+
+  return (
+    <>
+      {/* ─ Sub-tabs de categoría ─ */}
+      {category && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "28px", borderBottom: "1px solid var(--color-border-tertiary)", paddingBottom: "20px" }}>
+          <button className={`sub-tab ${view === "todas" ? "act" : ""}`}       onClick={() => setView("todas")}>Todas ({catTotal})</button>
+          <button className={`sub-tab ${view === "pendientes" ? "act" : ""}`}  onClick={() => setView("pendientes")}>Pendientes ({catPend})</button>
+          <button className={`sub-tab ${view === "completadas" ? "act" : ""}`} onClick={() => setView("completadas")}>Completadas ({catDone})</button>
+          <button className={`sub-tab ${view === "vencidas" ? "act" : ""}`}    onClick={() => setView("vencidas")}>Vencidas ({catOver})</button>
+        </div>
+      )}
+
+      {/* ─ Contador de resultados ─ */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-text-secondary)", textTransform: "uppercase", letterSpacing: "1px" }}>
+          {category ? `Mostrando: ${VT[view] || "Listado"}` : "Listado"}
+        </span>
+        <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-text-info)", background: "var(--color-background-info)", padding: "4px 12px", borderRadius: "999px" }}>
+          {filtered.length} elementos
+        </span>
+      </div>
+
+      {/* ─ Estado vacío ─ */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "80px 20px" }}>
+          <i className="ti ti-clipboard-list" style={{ fontSize: "54px", color: "var(--color-text-tertiary)", display: "block", marginBottom: "18px" }}></i>
+          <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: "8px" }}>Sin tareas aquí</div>
+          <div style={{ fontSize: "14px", color: "var(--color-text-tertiary)" }}>
+            {search ? "No hay resultados para tu búsqueda" : "Crea una nueva tarea para comenzar"}
+          </div>
+        </div>
+      ) : (
+        /* ─ Acordeones por mes ─ */
+        <div>
+          {sortedMonthKeys.map((mk) => (
+            <MonthAccordion key={mk} mk={mk} tasks={groupedTasks[mk]} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+</file>
+
+<file path="frontend/src/utils/dateHelpers.js">
+// ─── dateHelpers.js ───────────────────────────────────────────────────────────
+// Funciones utilitarias de fecha para calcular buckets, etiquetas y formato.
+// Sin dependencias externas — se puede testear de forma aislada.
+
+export const today0 = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+export const addDays = (n) => {
+  const d = today0();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().split("T")[0];
+};
+
+export const getBucket = (dueDate) => {
+  if (!dueDate) return "sin-fecha";
+  const now = today0();
+  const due = new Date(dueDate + "T00:00:00");
+  due.setHours(0, 0, 0, 0);
+  const diff = Math.round((due - now) / 86400000);
+  if (diff < 0)   return "vencidas";
+  if (diff === 0) return "hoy";
+  if (diff === 1) return "manana";
+  return `${due.getFullYear()}-${String(due.getMonth() + 1).padStart(2, "0")}`;
+};
+
+export const getMonthKey = (dueDate) => {
+  if (!dueDate) return "0000-00";
+  const due = new Date(dueDate + "T00:00:00");
+  return `${due.getFullYear()}-${String(due.getMonth() + 1).padStart(2, "0")}`;
+};
+
+export const monthLabel = (id) => {
+  if (id === "0000-00") return "Sin fecha definida";
+  const [y, m] = id.split("-");
+  const s = new Date(+y, +m - 1, 1).toLocaleDateString("es-CL", {
+    month: "long",
+    year: "numeric",
+  });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
+export const fmtDateStr = (dueDate) => {
+  const b = getBucket(dueDate);
+  if (b === "hoy")    return "Hoy";
+  if (b === "manana") return "Mañana";
+  return new Date(dueDate + "T00:00:00").toLocaleDateString("es-CL", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+</file>
+
+<file path="frontend/src/utils/mockData.js">
+// ─── mockData.js ──────────────────────────────────────────────────────────────
+// Constantes de configuración y datos de muestra.
+// Cuando se conecte el backend real, INIT_TASKS se reemplaza por llamadas HTTP.
+
+import { addDays } from "./dateHelpers";
+
+// ─ Paleta de colores por categoría ───────────────────────────────────────────
+export const CAT_COLOR = {
+  Personal: "#7C3AED",
+  Trabajo:  "#0EA5E9",
+  Compras:  "#F59E0B",
+  Salud:    "#10B981",
+  Familia:  "#EC4899",
+};
+
+// ─ Íconos Tabler por categoría ───────────────────────────────────────────────
+export const CAT_ICON = {
+  Personal: "ti-user",
+  Trabajo:  "ti-briefcase",
+  Compras:  "ti-shopping-bag",
+  Salud:    "ti-heart",
+  Familia:  "ti-users",
+};
+
+// ─ Etiquetas de vistas (para el TopBar) ──────────────────────────────────────
+export const VT = {
+  dashboard:   "Dashboard",
+  todas:       "Todas las tareas",
+  pendientes:  "Pendientes",
+  completadas: "Completadas",
+  vencidas:    "Vencidas",
+  ajustes:     "Ajustes",
+};
+
+// ─ 12 meses del año 2026 para el navegador de fechas ─────────────────────────
+export const ALL_MONTHS = Array.from(
+  { length: 12 },
+  (_, i) => `2026-${String(i + 1).padStart(2, "0")}`
+);
+
+// ─ Tareas de ejemplo (reemplazar por fetch al backend en producción) ──────────
+export const INIT_TASKS = [
+  { id: 101, title: "Configurar Keycloak y Docker",   notes: "Entorno de desarrollo local levantado",    category: "Trabajo",  dueDate: "2026-03-15",  completed: true  },
+  { id: 102, title: "Torneo Tenis de Mesa",            notes: "Fase de grupos",                           category: "Salud",    dueDate: "2026-04-10",  completed: true  },
+  { id: 103, title: "Hito 0 - Planificación",          notes: "Entrega de Excel y roles definidos",       category: "Trabajo",  dueDate: "2026-04-05",  completed: true  },
+  { id: 104, title: "Reunión Grupo 3",                 notes: "Coordinar maquetación y UI/UX del panel",  category: "Trabajo",  dueDate: "2026-05-15",  completed: false },
+  { id: 105, title: "Migrar base de datos a Neon",     notes: "Revisar modelos SQLAlchemy",               category: "Trabajo",  dueDate: addDays(0),    completed: false },
+  { id: 106, title: "Pagar mensualidad",               notes: "Transferencia portal alumno",              category: "Personal", dueDate: addDays(1),    completed: false },
+  { id: 107, title: "Comprar zapatillas deportivas",   notes: "Para los entrenamientos de la semana",     category: "Compras",  dueDate: "2026-05-28",  completed: false },
+  { id: 108, title: "Corte de pelo (Taper fade)",      notes: "Pedir hora con el barbero",                category: "Personal", dueDate: "2026-06-05",  completed: false },
+  { id: 109, title: "Hito 6 - Defensa Final",          notes: "Presentación del proyecto",                category: "Trabajo",  dueDate: "2026-07-08",  completed: false },
+  { id: 110, title: "Reunión con cliente WellQ",       notes: "Validar dashboard administrativo",         category: "Trabajo",  dueDate: "2026-06-15",  completed: false },
+  { id: 111, title: "Prueba recuperativa",             notes: "Repasar estructuras de datos",             category: "Trabajo",  dueDate: "2026-06-25",  completed: false },
+  { id: 112, title: "Renovar suscripción servidores",  notes: "Hosting y dominios",                       category: "Compras",  dueDate: "2026-08-10",  completed: false },
+];
+</file>
+
+<file path="frontend/vite.config.js">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3000,
+    // Redirige /api al backend local durante desarrollo
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      }
+    }
+  }
+})
+</file>
+
+<file path="infra/.gitkeep">
+
+</file>
+
+<file path="backend/src/index.js">
+/**
+ * Main Server Entry Point
+ * Responsable de configurar e iniciar el servidor Express
+ * SRP: Solo configura middlewares, rutas y levanta el servidor
+ */
+
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const healthRoutes = require('../routes/health');
+const authRoutes = require('../routes/auth');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// ==================== MIDDLEWARES ====================
+
+// Seguridad - Helmet protege contra vulnerabilidades comunes
+app.use(helmet());
+
+// CORS - Permite solicitudes desde diferentes orígenes
+app.use(cors());
+
+// Parseo de JSON
+app.use(express.json());
+
+// ==================== RUTAS ====================
+
+// Rutas de salud y monitoreo (siempre habilitadas)
+app.use('/api/health', healthRoutes);
+
+// Rutas de autenticación (controladas por feature flag)
+if (process.env.FEATURE_AUTH_ENABLED === 'true') {
+  app.use('/api/auth', authRoutes);
+  console.log('✓ Módulo AUTH habilitado');
+} else {
+  console.log('✗ Módulo AUTH deshabilitado (FEATURE_AUTH_ENABLED=false)');
+}
+
+// ==================== SERVIDOR ====================
+
+// Iniciar servidor
+app.listen(PORT, () => {
+  console.log(`✓ Servidor ejecutándose en puerto ${PORT}`);
+  console.log(`✓ Endpoints de salud disponibles en http://localhost:${PORT}/api/health`);
+});
+</file>
+
+<file path="readme.md">
+## ☁️ CloudTask — To-Do App
+
+Aplicación web de gestión de tareas personales, desarrollada como proyecto universitario.
+
+---
+
+## 🧰 Stack Tecnológico
+
+| Capa | Tecnología |
+|------|------------|
+| Frontend | React + Vite |
+| Backend | Node.js + Express.js |
+| Base de datos | PostgreSQL (AWS RDS) |
+| Caché | Redis (AWS ElastiCache) |
+| Autenticación | Amazon Cognito |
+| Hosting frontend | AWS S3 + CloudFront |
+| Contenedores | Docker + AWS ECS Fargate |
+
+---
+
+
+## 📁 Estructura del Proyecto
+
+```
+todo-app-cloud-grupo4/
+│
+├── 📂 frontend/
+│   ├── node_modules/                         # ✅ Dependencias instaladas (npm install)
+│   ├── public/
+│   │   └── favicon.ico                       # ⚠️ Falta por agregar
+│   ├── src/
+│   │   ├── assets/
+│   │   │   └── styles/
+│   │   │       └── global.css                # ✅ Variables CSS y clases base (separado del JSX)
+│   │   ├── components/
+│   │   │   ├── layout/
+│   │   │   │   ├── Sidebar.jsx               # ✅ Sidebar colapsable con navegación
+│   │   │   │   └── TopBar.jsx                # ✅ Barra superior con búsqueda y nueva tarea
+│   │   │   └── ui/
+│   │   │       ├── StatCard.jsx              # ✅ Tarjeta de estadística
+│   │   │       ├── TaskCard.jsx              # ✅ Tarjeta de tarea individual
+│   │   │       ├── TaskModal.jsx             # ✅ Modal crear/editar tarea
+│   │   │       └── MonthAccordion.jsx        # ✅ Acordeón por mes
+│   │   ├── context/
+│   │   │   └── AppContext.jsx                # ✅ Estado global + lógica central
+│   │   ├── pages/
+│   │   │   ├── Dashboard/
+│   │   │   │   └── DashboardView.jsx         # ✅ Vista principal del dashboard
+│   │   │   ├── Tasks/
+│   │   │   │   └── TasksView.jsx             # ✅ Vista de listados (Todas/Pendientes/etc.)
+│   │   │   └── Settings/
+│   │   │       └── SettingsView.jsx          # ✅ Vista de Ajustes del sistema
+│   │   ├── services/                         # ⚠️ Falta por agregar — Llamadas HTTP al backend
+│   │   ├── utils/
+│   │   │   ├── dateHelpers.js                # ✅ Funciones puras de fecha
+│   │   │   └── mockData.js                   # ✅ Datos de prueba + constantes
+│   │   ├── App.jsx                           # ✅ Raíz: contexto + tema + rutas
+│   │   └── main.jsx                          # ✅ Punto de entrada React (sin cambios)
+│   ├── .env.example                          # ⚠️ Falta por agregar
+│   ├── .gitignore
+│   ├── index.html                            # ✅ Punto de entrada HTML (Vite)
+│   ├── package.json
+│   ├── package-lock.json
+│   └── vite.config.js
+│
+├── 📂 backend/
+│   ├── node_modules/                         # ✅ Dependencias instaladas (npm install)
+│   ├── controllers/                          # ⚠️ Falta por agregar — Lógica CRUD de tareas
+│   ├── middlewares/                          # ⚠️ Falta por agregar — Validación JWT (Cognito)
+│   ├── models/                               # ⚠️ Falta por agregar — Estructura tablas PostgreSQL
+│   ├── routes/                               # ⚠️ Falta por agregar — Endpoints REST
+│   └── src/
+│       ├── config/
+│       │   ├── db.js                         # ⚠️ Falta por agregar — Conexión RDS PostgreSQL
+│       │   ├── cache.js                      # ⚠️ Falta por agregar — Conexión ElastiCache Redis
+│       │   └── aws.js                        # ⚠️ Falta por agregar — Secrets Manager
+│       └── index.js                          # ⚠️ Falta por agregar — Servidor principal Express
+│   ├── package.json                          # ✅ Generado con npm init
+│   ├── package-lock.json                     # ✅ Generado automáticamente
+│   ├── .env.example                          # ⚠️ Falta por agregar
+│   └── Dockerfile                            # ⚠️ Falta por agregar
+│
+├── 📂 infra/
+│   ├── buildspec.yml                         # ⚠️ Falta por agregar
+│   └── task-definition.json                  # ⚠️ Falta por agregar
+│
+└── README.md
+```
+
+
+## 📁 instalacion frontend
+    
+cd frontend
+npm install
+
+
+## 📁 instalacion backend
+
+cd backend
+
+npm init -y
+npm install express pg ioredis jsonwebtoken jwks-rsa dotenv cors helmet @aws-sdk/client-secrets-manager
+npm install --save-dev nodemon
+
+
+## Para git hub 
+
+1. Preparar todos los cambios nuevos o modificados
+
+git add .
+
+2. Guardar el punto de control con un mensaje claro
+
+git commit -m "cambios"
+
+3. Subir los cambios a la nube (ya no necesitas el -u origin main)
+
+git push
+</file>
+
+<file path="backend/controllers/authController.js">
+/**
+ * Auth Controller
+ * Responsable de la lógica de autenticación
+ * SRP: Solo maneja operaciones de autenticación y autorización
+ */
+
+/**
+ * Registra un nuevo usuario
+ * POST /api/auth/register
+ */
+const register = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint register' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Confirma el registro de un usuario
+ * POST /api/auth/confirm
+ */
+const confirm = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint confirm' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Autentica un usuario (login)
+ * POST /api/auth/login
+ */
+const login = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint login' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Refresca el token de autenticación
+ * POST /api/auth/refresh
+ */
+const refresh = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint refresh' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Solicita restablecimiento de contraseña
+ * POST /api/auth/forgot-password
+ */
+const forgotPassword = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint forgotPassword' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Restablece la contraseña con token
+ * POST /api/auth/reset-password
+ */
+const resetPassword = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint resetPassword' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Cierra sesión del usuario
+ * POST /api/auth/logout
+ */
+const logout = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint logout' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Configura MFA (autenticación de dos factores)
+ * POST /api/auth/mfa/setup
+ */
+const setupMFA = async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Endpoint setupMFA' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  register,
+  confirm,
+  login,
+  refresh,
+  forgotPassword,
+  resetPassword,
+  logout,
+  setupMFA
+};
+</file>
+
+</files>

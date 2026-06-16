@@ -1,9 +1,8 @@
 // ─── AppContext.jsx ───────────────────────────────────────────────────────────
 // Estado global de Planea: navegación, tareas, filtros, modal y UI.
 // Expone todo vía useApp() — ningún componente maneja estado local relevante.
-
-import React, { createContext, useContext, useState } from "react";
-import { INIT_TASKS } from "../utils/mockData";
+import React, { createContext, useContext, useState, useEffect } from "react";
+// Se mantiene la importación de helpers
 import { addDays, getBucket, getMonthKey } from "../utils/dateHelpers";
 
 const AppContext = createContext(null);
@@ -22,8 +21,8 @@ export default function AppProvider({ children }) {
   const [search, setSearch]                         = useState("");
   const [collapsedOverrides, setCollapsedOverrides] = useState({});
 
-  // ── Tareas ──────────────────────────────────────────────────────────────────
-  const [tasks, setTasks] = useState(INIT_TASKS);
+  // ── Tareas (Estado Global) ──────────────────────────────────────────────────
+  const [tasks, setTasks] = useState([]);
 
   // ── Modal ───────────────────────────────────────────────────────────────────
   const [showModal, setModal] = useState(false);
@@ -33,10 +32,30 @@ export default function AppProvider({ children }) {
   const [fNotes, setFNotes]   = useState("");
   const [fCat, setFCat]       = useState("Personal");
 
-  // ── Stats globales ──────────────────────────────────────────────────────────
-  const total    = tasks.length;
-  const doneN    = tasks.filter((t) => t.completed).length;
-  const pendN    = tasks.filter((t) => !t.completed).length;
+  // ── Carga inicial desde PostgreSQL (Centralizada) ───────────────────────────
+  const [apiStats, setApiStats] = useState(null);
+
+  useEffect(() => {
+    // Cargar Estadísticas
+    fetch('/api/dashboard/stats')
+      .then(res => res.json())
+      .then(data => setApiStats(data))
+      .catch(err => console.error("Error API Stats:", err));
+
+    // Cargar Tareas Reales
+    fetch('/api/tasks')
+      .then(res => res.json())
+      .then(response => {
+        if (response.status === 'success') {
+          setTasks(response.data);
+        }
+      })
+      .catch(err => console.error("Error API Tasks:", err));
+  }, []);
+
+  const total    = apiStats ? apiStats.total : tasks.length;
+  const doneN    = apiStats ? apiStats.completed : tasks.filter((t) => t.completed).length;
+  const pendN    = apiStats ? apiStats.pending : tasks.filter((t) => !t.completed).length;
   const overdueN = tasks.filter((t) => getBucket(t.dueDate) === "vencidas" && !t.completed).length;
 
   // ── Stats por categoría ─────────────────────────────────────────────────────
@@ -51,7 +70,7 @@ export default function AppProvider({ children }) {
   if (search.trim()) {
     const q = search.toLowerCase();
     filtered = filtered.filter(
-      (t) => t.title.toLowerCase().includes(q) || t.notes.toLowerCase().includes(q)
+      (t) => t.title.toLowerCase().includes(q) || (t.notes && t.notes.toLowerCase().includes(q))
     );
   }
   if (category)             filtered = filtered.filter((t) => t.category === category);
@@ -93,7 +112,7 @@ export default function AppProvider({ children }) {
   // ── Acordeón inteligente ────────────────────────────────────────────────────
   const isMonthCollapsed = (mk) => {
     if (collapsedOverrides[mk] !== undefined) return collapsedOverrides[mk];
-    return mk !== currentMonthKey; // Por defecto: solo el mes actual está abierto
+    return mk !== currentMonthKey;
   };
   const toggleMonth = (mk) => {
     setCollapsedOverrides((prev) => ({
@@ -110,19 +129,80 @@ export default function AppProvider({ children }) {
     setDateFilter(f);
   };
 
-  // ── CRUD de tareas ──────────────────────────────────────────────────────────
-  const toggleTask = (id) => setTasks(tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t));
-  const deleteTask = (id) => setTasks(tasks.filter((t) => t.id !== id));
-  const openAdd    = () => { setEditId(null); setFTitle(""); setFDate(addDays(0)); setFNotes(""); setFCat("Personal"); setModal(true); };
-  const openEdit   = (t) => { setEditId(t.id); setFTitle(t.title); setFDate(t.dueDate || addDays(0)); setFNotes(t.notes); setFCat(t.category); setModal(true); };
-  const saveTask   = () => {
-    if (!fTitle.trim()) return;
-    if (editId !== null) {
-      setTasks(tasks.map((t) => t.id === editId ? { ...t, title: fTitle, dueDate: fDate, notes: fNotes, category: fCat } : t));
-    } else {
-      setTasks([{ id: Date.now(), title: fTitle, dueDate: fDate, notes: fNotes, category: fCat, completed: false }, ...tasks]);
+  // ── CRUD de tareas (Conectado a la BD) ──────────────────────────────────────
+  const toggleTask = async (id) => {
+    // 1. Encontramos la tarea actual para invertir su estado
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    // 2. Actualizamos la interfaz instantáneamente (Optimistic UI)
+    setTasks(tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t));
+
+    // 3. Le avisamos a PostgreSQL en segundo plano
+    try {
+      await fetch(`/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...task, completed: !task.completed })
+      });
+    } catch (error) {
+      console.error("Error al completar tarea:", error);
     }
-    setModal(false);
+  };
+  
+  const deleteTask = async (id) => {
+    // 1. Borramos de la interfaz instantáneamente
+    setTasks(tasks.filter((t) => t.id !== id));
+
+    // 2. Le pedimos a PostgreSQL que la destruya
+    try {
+      await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    } catch (error) {
+      console.error("Error al eliminar tarea:", error);
+    }
+  };
+  
+  const openAdd  = () => { setEditId(null); setFTitle(""); setFDate(addDays(0)); setFNotes(""); setFCat("Personal"); setModal(true); };
+  const openEdit = (t) => { setEditId(t.id); setFTitle(t.title); setFDate(t.dueDate || addDays(0)); setFNotes(t.notes || ""); setFCat(t.category); setModal(true); };
+  
+  const saveTask = async () => {
+    if (!fTitle.trim()) return;
+
+    const taskData = { title: fTitle, category: fCat, dueDate: fDate, notes: fNotes };
+
+    if (editId !== null) {
+      // MODO EDICIÓN (PUT a PostgreSQL)
+      taskData.completed = tasks.find(t => t.id === editId)?.completed || false;
+      
+      setTasks(tasks.map((t) => t.id === editId ? { ...t, ...taskData } : t));
+      setModal(false);
+
+      try {
+        await fetch(`/api/tasks/${editId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(taskData)
+        });
+      } catch (error) {
+        console.error("Error al editar tarea:", error);
+      }
+    } else {
+      // MODO CREACIÓN (POST a PostgreSQL)
+      try {
+        const response = await fetch('/api/tasks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(taskData)
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          setTasks([result.data, ...tasks]);
+          setModal(false);
+        }
+      } catch (error) {
+        console.error("Error al crear tarea:", error);
+      }
+    }
   };
 
   // ── Misc ────────────────────────────────────────────────────────────────────
@@ -132,25 +212,41 @@ export default function AppProvider({ children }) {
 
   // ── Valor del contexto ──────────────────────────────────────────────────────
   const value = {
-    // Estado de navegación
     view, setView, category, dateFilter, showMonths,
-    // Estado de UI
     darkMode, setDarkMode, isSidebarCollapsed, setIsSidebarCollapsed,
     search, setSearch,
-    // Estado del modal
     showModal, setModal, editId,
     fTitle, setFTitle, fDate, setFDate, fNotes, setFNotes, fCat, setFCat,
-    // Stats
     total, doneN, pendN, overdueN,
     catTotal, catDone, catPend, catOver,
-    // Datos derivados
     filtered, groupedTasks, sortedMonthKeys, recentTasks, currentMonthKey,
-    // Funciones de acordeón
     isMonthCollapsed, toggleMonth,
-    // Acciones
     go, goCat, setDF, toggleTask, deleteTask, openAdd, openEdit, saveTask,
     handleLogout, dayLabel, showSearch,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
+// ── Registrar dispositivo para notificaciones ──────────────────────────────
+  const registerDevice = async () => {
+    // Simulamos un token (en un entorno real usarías Firebase o Web Push)
+    // Usaremos un identificador único basado en el tiempo si es la primera vez
+    const token = localStorage.getItem("device_token") || `browser_${Date.now()}`;
+    localStorage.setItem("device_token", token);
+
+    try {
+      await fetch('/api/devices/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, type: 'browser' })
+      });
+      console.log("Dispositivo registrado exitosamente");
+    } catch (error) {
+      console.error("Error registrando dispositivo:", error);
+    }
+  };
+
+  // Ejecutamos el registro al iniciar la app
+  useEffect(() => {
+    registerDevice();
+  }, []);
