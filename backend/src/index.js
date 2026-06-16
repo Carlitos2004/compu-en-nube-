@@ -12,6 +12,7 @@ const authRoutes = require('../routes/auth');
 const notificationRoutes = require('../routes/notifications');
 const reportRoutes = require('../routes/reports');
 const taskRoutes = require('../routes/tasks');
+const usersRoutes = require('../routes/users')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,6 +35,13 @@ if (process.env.FEATURE_AUTH_ENABLED === 'true') {
 // Forzar tus rutas (Sin Feature Flags para evitar bloqueos locales)
 app.use('/api/notifications', notificationRoutes);
 console.log('✓ Módulo NOTIFICATIONS habilitado (Forzado)');
+if (process.env.FEATURE_USERS_ENABLED === 'true') {
+  app.use('/api/users', usersRoutes)
+  console.log('✓ Módulo USERS habilitado')
+} else {
+  console.log('✗ Módulo USERS deshabilitado (FEATURE_USERS_ENABLED=false)')
+}
+// ==================== SERVIDOR ====================
 
 app.use('/api', reportRoutes); 
 console.log('✓ Módulo REPORTS habilitado (Forzado)');
