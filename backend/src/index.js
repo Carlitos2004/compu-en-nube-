@@ -11,6 +11,7 @@ const helmet = require('helmet');
 const healthRoutes = require('../routes/health');
 const authRoutes = require('../routes/auth');
 const usersRoutes = require('../routes/users')
+const tasksRoutes = require('../routes/tasks')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -44,6 +45,13 @@ if (process.env.FEATURE_USERS_ENABLED === 'true') {
 } else {
   console.log('✗ Módulo USERS deshabilitado (FEATURE_USERS_ENABLED=false)')
 }
+if (process.env.FEATURE_TASKS_ENABLED === 'true') {
+  app.use('/api/tasks', tasksRoutes)
+  console.log('Modulo TASKS habilitado')
+} else {
+  console.log('Modulo TASKS deshabilitado (FEATURE_TASKS_ENABLED=false)')
+}
+
 // ==================== SERVIDOR ====================
 
 // Iniciar servidor
