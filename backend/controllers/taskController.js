@@ -17,6 +17,15 @@ const parseTaskId = (id) => {
   return Number.isInteger(taskId) && taskId > 0 ? taskId : null
 }
 
+const ensureTaskOwner = async (taskId, userId, includeDeleted = false) => {
+  const deletedFilter = includeDeleted ? '' : 'AND deleted_at IS NULL'
+  const { rows } = await pool.query(
+    `SELECT id FROM tareas WHERE id = $1 AND cognito_sub = $2 ${deletedFilter}`,
+    [taskId, userId]
+  )
+  return rows.length > 0
+}
+
 const listTasks = async (req, res) => {
   try {
     const { category, date, sort = 'asc', status, includeDeleted } = req.query
@@ -253,6 +262,189 @@ const restoreTask = async (req, res) => {
   }
 }
 
+const createSubtask = async (req, res) => {
+  try {
+    const taskId = parseTaskId(req.params.id)
+    const { title } = req.body
+    if (!taskId) return res.status(400).json({ error: 'ID de tarea invalido' })
+    if (!title || !title.trim()) return res.status(400).json({ error: 'El titulo es obligatorio' })
+
+    const hasTask = await ensureTaskOwner(taskId, req.userId)
+    if (!hasTask) return res.status(404).json({ error: 'Tarea no encontrada' })
+
+    const { rows } = await pool.query(
+      `INSERT INTO subtareas (task_id, title)
+       VALUES ($1, $2)
+       RETURNING id, task_id, title, completed, created_at, updated_at`,
+      [taskId, title.trim()]
+    )
+    return res.status(201).json({ subtask: rows[0] })
+  } catch (error) {
+    console.error('Error en createSubtask:', error)
+    return res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
+const updateSubtask = async (req, res) => {
+  try {
+    const taskId = parseTaskId(req.params.id)
+    const subtaskId = parseTaskId(req.params.subId)
+    const { title, completed } = req.body
+    if (!taskId || !subtaskId) return res.status(400).json({ error: 'ID invalido' })
+
+    const hasTask = await ensureTaskOwner(taskId, req.userId)
+    if (!hasTask) return res.status(404).json({ error: 'Tarea no encontrada' })
+
+    const { rows } = await pool.query(
+      `UPDATE subtareas
+       SET title = COALESCE($1, title),
+           completed = COALESCE($2, completed),
+           updated_at = NOW()
+       WHERE id = $3 AND task_id = $4
+       RETURNING id, task_id, title, completed, created_at, updated_at`,
+      [title ? title.trim() : null, completed === undefined ? null : completed, subtaskId, taskId]
+    )
+    if (rows.length === 0) return res.status(404).json({ error: 'Subtarea no encontrada' })
+
+    return res.status(200).json({ subtask: rows[0] })
+  } catch (error) {
+    console.error('Error en updateSubtask:', error)
+    return res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
+const uploadAttachment = async (req, res) => {
+  try {
+    const taskId = parseTaskId(req.params.id)
+    if (!taskId) return res.status(400).json({ error: 'ID de tarea invalido' })
+    if (!req.file) return res.status(400).json({ error: 'Debes adjuntar un archivo' })
+
+    const hasTask = await ensureTaskOwner(taskId, req.userId)
+    if (!hasTask) return res.status(404).json({ error: 'Tarea no encontrada' })
+
+    const fileName = req.file.originalname
+    const s3Key = `tasks/${req.userId}/${taskId}/${Date.now()}-${fileName}`
+    const fileUrl = process.env.S3_BUCKET_NAME
+      ? `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`
+      : `local://${s3Key}`
+
+    const { rows } = await pool.query(
+      `INSERT INTO task_attachments (task_id, file_name, file_url, mime_type, size_bytes, s3_key)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, task_id, file_name, file_url, mime_type, size_bytes, created_at`,
+      [taskId, fileName, fileUrl, req.file.mimetype, req.file.size, s3Key]
+    )
+
+    return res.status(201).json({ attachment: rows[0] })
+  } catch (error) {
+    console.error('Error en uploadAttachment:', error)
+    return res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
+const deleteAttachment = async (req, res) => {
+  try {
+    const taskId = parseTaskId(req.params.id)
+    const attachmentId = parseTaskId(req.params.attId)
+    if (!taskId || !attachmentId) return res.status(400).json({ error: 'ID invalido' })
+
+    const hasTask = await ensureTaskOwner(taskId, req.userId, true)
+    if (!hasTask) return res.status(404).json({ error: 'Tarea no encontrada' })
+
+    const { rows } = await pool.query(
+      `DELETE FROM task_attachments
+       WHERE id = $1 AND task_id = $2
+       RETURNING id, file_name`,
+      [attachmentId, taskId]
+    )
+    if (rows.length === 0) return res.status(404).json({ error: 'Adjunto no encontrado' })
+
+    return res.status(200).json({ mensaje: 'Adjunto eliminado', attachment: rows[0] })
+  } catch (error) {
+    console.error('Error en deleteAttachment:', error)
+    return res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
+const bulkComplete = async (req, res) => {
+  try {
+    const { ids } = req.body
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'Debes enviar un arreglo de ids' })
+    }
+
+    const { rows } = await pool.query(
+      `UPDATE tareas
+       SET completed = TRUE,
+           updated_at = NOW()
+       WHERE cognito_sub = $1 AND id = ANY($2::int[]) AND deleted_at IS NULL
+       RETURNING id, title, completed`,
+      [req.userId, ids]
+    )
+
+    return res.status(200).json({ updated: rows.length, tasks: rows })
+  } catch (error) {
+    console.error('Error en bulkComplete:', error)
+    return res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
+const bulkDelete = async (req, res) => {
+  try {
+    const { ids, emptyTrash = false } = req.body || {}
+
+    if (emptyTrash) {
+      const { rowCount } = await pool.query(
+        'DELETE FROM tareas WHERE cognito_sub = $1 AND deleted_at IS NOT NULL',
+        [req.userId]
+      )
+      return res.status(200).json({ deleted: rowCount })
+    }
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'Debes enviar ids o emptyTrash=true' })
+    }
+
+    const { rows } = await pool.query(
+      `UPDATE tareas
+       SET deleted_at = NOW(),
+           updated_at = NOW()
+       WHERE cognito_sub = $1 AND id = ANY($2::int[]) AND deleted_at IS NULL
+       RETURNING id, title, deleted_at`,
+      [req.userId, ids]
+    )
+
+    return res.status(200).json({ deleted: rows.length, tasks: rows })
+  } catch (error) {
+    console.error('Error en bulkDelete:', error)
+    return res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
+const createComment = async (req, res) => {
+  try {
+    const taskId = parseTaskId(req.params.id)
+    const { comment } = req.body
+    if (!taskId) return res.status(400).json({ error: 'ID de tarea invalido' })
+    if (!comment || !comment.trim()) return res.status(400).json({ error: 'El comentario es obligatorio' })
+
+    const hasTask = await ensureTaskOwner(taskId, req.userId)
+    if (!hasTask) return res.status(404).json({ error: 'Tarea no encontrada' })
+
+    const { rows } = await pool.query(
+      `INSERT INTO task_comments (task_id, cognito_sub, comment)
+       VALUES ($1, $2, $3)
+       RETURNING id, task_id, cognito_sub, comment, created_at`,
+      [taskId, req.userId, comment.trim()]
+    )
+
+    return res.status(201).json({ comment: rows[0] })
+  } catch (error) {
+    console.error('Error en createComment:', error)
+    return res.status(500).json({ error: 'Error interno del servidor' })
+  }
+}
+
 module.exports = {
   listTasks,
   getTask,
@@ -260,5 +452,12 @@ module.exports = {
   updateTask,
   updateTaskStatus,
   deleteTask,
-  restoreTask
+  restoreTask,
+  createSubtask,
+  updateSubtask,
+  uploadAttachment,
+  deleteAttachment,
+  bulkComplete,
+  bulkDelete,
+  createComment
 }

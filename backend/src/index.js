@@ -12,6 +12,12 @@ const healthRoutes = require('../routes/health');
 const authRoutes = require('../routes/auth');
 const usersRoutes = require('../routes/users')
 const tasksRoutes = require('../routes/tasks')
+const categoriesRoutes = require('../routes/categories')
+const workspacesRoutes = require('../routes/workspaces')
+const notificationsRoutes = require('../routes/notifications')
+const devicesRoutes = require('../routes/devices')
+const reportsRoutes = require('../routes/reports')
+const integrationsRoutes = require('../routes/integrations')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,6 +37,7 @@ app.use(express.json());
 
 // Rutas de salud y monitoreo (siempre habilitadas)
 app.use('/api/health', healthRoutes);
+app.get('/api/metrics', require('../controllers/healthController').getMetrics);
 
 // Rutas de autenticación (controladas por feature flag)
 if (process.env.FEATURE_AUTH_ENABLED === 'true') {
@@ -50,6 +57,37 @@ if (process.env.FEATURE_TASKS_ENABLED === 'true') {
   console.log('Modulo TASKS habilitado')
 } else {
   console.log('Modulo TASKS deshabilitado (FEATURE_TASKS_ENABLED=false)')
+}
+if (process.env.FEATURE_CATEGORIES_ENABLED === 'true') {
+  app.use('/api/categories', categoriesRoutes)
+  console.log('Modulo CATEGORIES habilitado')
+} else {
+  console.log('Modulo CATEGORIES deshabilitado (FEATURE_CATEGORIES_ENABLED=false)')
+}
+if (process.env.FEATURE_TEAMS_ENABLED === 'true') {
+  app.use('/api/workspaces', workspacesRoutes)
+  console.log('Modulo TEAMS habilitado')
+} else {
+  console.log('Modulo TEAMS deshabilitado (FEATURE_TEAMS_ENABLED=false)')
+}
+if (process.env.FEATURE_NOTIFICATIONS_ENABLED === 'true') {
+  app.use('/api/notifications', notificationsRoutes)
+  app.use('/api/devices', devicesRoutes)
+  console.log('Modulo NOTIFICATIONS habilitado')
+} else {
+  console.log('Modulo NOTIFICATIONS deshabilitado (FEATURE_NOTIFICATIONS_ENABLED=false)')
+}
+if (process.env.FEATURE_REPORTS_ENABLED === 'true') {
+  app.use('/api', reportsRoutes)
+  console.log('Modulo REPORTS habilitado')
+} else {
+  console.log('Modulo REPORTS deshabilitado (FEATURE_REPORTS_ENABLED=false)')
+}
+if (process.env.FEATURE_INTEGRATIONS_ENABLED === 'true') {
+  app.use('/api', integrationsRoutes)
+  console.log('Modulo INTEGRATIONS habilitado')
+} else {
+  console.log('Modulo INTEGRATIONS deshabilitado (FEATURE_INTEGRATIONS_ENABLED=false)')
 }
 
 // ==================== SERVIDOR ====================
