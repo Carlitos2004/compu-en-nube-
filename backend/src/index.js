@@ -33,6 +33,15 @@ app.use(cors());
 // Parseo de JSON
 app.use(express.json());
 
+// Logger simple para desarrollo: muestra cada request que llega al backend
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+  res.on('finish', () => {
+    console.log(`[API] ${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - startedAt}ms`);
+  });
+  next();
+});
+
 // ==================== RUTAS ====================
 
 // Rutas de salud y monitoreo (siempre habilitadas)
