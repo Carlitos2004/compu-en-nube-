@@ -1,0 +1,16 @@
+# Dependencias
+node_modules/
+
+# Build de producción
+dist/
+
+# Variables de entorno (NUNCA subir al repo)
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+
+# Editor
+.DS_Store
+.vscode/
