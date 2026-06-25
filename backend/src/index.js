@@ -18,6 +18,10 @@ const notificationsRoutes = require('../routes/notifications')
 const devicesRoutes = require('../routes/devices')
 const reportsRoutes = require('../routes/reports')
 const integrationsRoutes = require('../routes/integrations')
+const pool = require('./config/db')
+const { crearTablaUsuarios } = require('../models/usuario')
+const { crearTablaTareas } = require('../models/tarea')
+const { crearTablasComplementarias } = require('../models/appTables')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -98,11 +102,28 @@ if (process.env.FEATURE_INTEGRATIONS_ENABLED === 'true') {
 } else {
   console.log('Modulo INTEGRATIONS deshabilitado (FEATURE_INTEGRATIONS_ENABLED=false)')
 }
+async function inicializarBaseDatos() {
+  try {
+    await pool.query('SELECT NOW()')
+    console.log('✅ Conectado a PostgreSQL')
 
+    await crearTablaUsuarios()
+    await crearTablaTareas()
+    await crearTablasComplementarias()
+
+    console.log('✅ Base de datos inicializada')
+  } catch (error) {
+    console.error('❌ Error inicializando la base de datos')
+    console.error(error)
+    process.exit(1)
+  }
+}
 // ==================== SERVIDOR ====================
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`✓ Servidor ejecutándose en puerto ${PORT}`);
-  console.log(`✓ Endpoints de salud disponibles en http://localhost:${PORT}/api/health`);
-});
+inicializarBaseDatos().then(() => {
+  app.listen(PORT, () => {
+    console.log(`✓ Servidor ejecutándose en puerto ${PORT}`)
+    console.log(`✓ Endpoints de salud disponibles en http://localhost:${PORT}/api/health`)
+  })
+})
