@@ -1,0 +1,39 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        working-directory: backend
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        working-directory: backend
+        run: npm test
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Docker
+        working-directory: backend
+        run: docker build -t todoapp-backend .
