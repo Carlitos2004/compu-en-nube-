@@ -1,118 +1,223 @@
-## ☁️ CloudTask — To-Do App
+CloudTask – Gestión de Tareas en la Nube
 
-Aplicación web de gestión de tareas personales, desarrollada como proyecto universitario.
+Aplicación web para la gestión de tareas desarrollada con una arquitectura Frontend + Backend + Base de Datos en la nube, desplegada sobre AWS EC2.
 
----
+Integrantes
+Nicolás Exequiel Dreller
+Carlos (Agregar apellido)
+(Agregar resto del equipo)
+Tecnologías utilizadas
+Frontend
+React
+Vite
+React Router
+Backend
+Node.js 20
+Express.js
+Base de datos
+Neon PostgreSQL (Cloud)
+Infraestructura
+AWS EC2 (Amazon Linux 2023)
+PM2
+GitHub Actions
+Docker
+Arquitectura
+Usuario
+    │
+    ▼
+Frontend (React + Vite)
+Puerto 3000
+    │
+    ▼
+Backend (Node + Express)
+Puerto 5000
+    │
+    ▼
+Neon PostgreSQL
+(Base de datos Cloud)
+Requisitos
+Node.js 20
+npm
+Git
+Cuenta de AWS
+Base de datos Neon
+Instalación
+1. Clonar repositorio
+git clone https://github.com/Carlitos2004/compu-en-nube-.git
 
-## 🧰 Stack Tecnológico
+cd compu-en-nube-
+2. Backend
 
-| Capa | Tecnología |
-|------|------------|
-| Frontend | React + Vite |
-| Backend | Node.js + Express.js |
-| Base de datos | PostgreSQL (AWS RDS) |
-| Caché | Redis (AWS ElastiCache) |
-| Autenticación | Amazon Cognito |
-| Hosting frontend | AWS S3 + CloudFront |
-| Contenedores | Docker + AWS ECS Fargate |
-
----
-
-
-## 📁 Estructura del Proyecto
-
-```
-todo-app-cloud-grupo4/
-│
-├── 📂 frontend/
-│   ├── node_modules/                         # ✅ Dependencias instaladas (npm install)
-│   ├── public/
-│   │   └── favicon.ico                       # ⚠️ Falta por agregar
-│   ├── src/
-│   │   ├── assets/
-│   │   │   └── styles/
-│   │   │       └── global.css                # ✅ Variables CSS y clases base (separado del JSX)
-│   │   ├── components/
-│   │   │   ├── layout/
-│   │   │   │   ├── Sidebar.jsx               # ✅ Sidebar colapsable con navegación
-│   │   │   │   └── TopBar.jsx                # ✅ Barra superior con búsqueda y nueva tarea
-│   │   │   └── ui/
-│   │   │       ├── StatCard.jsx              # ✅ Tarjeta de estadística
-│   │   │       ├── TaskCard.jsx              # ✅ Tarjeta de tarea individual
-│   │   │       ├── TaskModal.jsx             # ✅ Modal crear/editar tarea
-│   │   │       └── MonthAccordion.jsx        # ✅ Acordeón por mes
-│   │   ├── context/
-│   │   │   └── AppContext.jsx                # ✅ Estado global + lógica central
-│   │   ├── pages/
-│   │   │   ├── Dashboard/
-│   │   │   │   └── DashboardView.jsx         # ✅ Vista principal del dashboard
-│   │   │   ├── Tasks/
-│   │   │   │   └── TasksView.jsx             # ✅ Vista de listados (Todas/Pendientes/etc.)
-│   │   │   └── Settings/
-│   │   │       └── SettingsView.jsx          # ✅ Vista de Ajustes del sistema
-│   │   ├── services/                         # ⚠️ Falta por agregar — Llamadas HTTP al backend
-│   │   ├── utils/
-│   │   │   ├── dateHelpers.js                # ✅ Funciones puras de fecha
-│   │   │   └── mockData.js                   # ✅ Datos de prueba + constantes
-│   │   ├── App.jsx                           # ✅ Raíz: contexto + tema + rutas
-│   │   └── main.jsx                          # ✅ Punto de entrada React (sin cambios)
-│   ├── .env.example                          # ⚠️ Falta por agregar
-│   ├── .gitignore
-│   ├── index.html                            # ✅ Punto de entrada HTML (Vite)
-│   ├── package.json
-│   ├── package-lock.json
-│   └── vite.config.js
-│
-├── 📂 backend/
-│   ├── node_modules/                         # ✅ Dependencias instaladas (npm install)
-│   ├── controllers/                          # ⚠️ Falta por agregar — Lógica CRUD de tareas
-│   ├── middlewares/                          # ⚠️ Falta por agregar — Validación JWT (Cognito)
-│   ├── models/                               # ⚠️ Falta por agregar — Estructura tablas PostgreSQL
-│   ├── routes/                               # ⚠️ Falta por agregar — Endpoints REST
-│   └── src/
-│       ├── config/
-│       │   ├── db.js                         # ⚠️ Falta por agregar — Conexión RDS PostgreSQL
-│       │   ├── cache.js                      # ⚠️ Falta por agregar — Conexión ElastiCache Redis
-│       │   └── aws.js                        # ⚠️ Falta por agregar — Secrets Manager
-│       └── index.js                          # ⚠️ Falta por agregar — Servidor principal Express
-│   ├── package.json                          # ✅ Generado con npm init
-│   ├── package-lock.json                     # ✅ Generado automáticamente
-│   ├── .env.example                          # ⚠️ Falta por agregar
-│   └── Dockerfile                            # ⚠️ Falta por agregar
-│
-├── 📂 infra/
-│   ├── buildspec.yml                         # ⚠️ Falta por agregar
-│   └── task-definition.json                  # ⚠️ Falta por agregar
-│
-└── README.md
-```
-
-
-## 📁 instalacion frontend
-    
-cd frontend
-npm install
-
-
-## 📁 instalacion backend
+Entrar al backend
 
 cd backend
 
-npm init -y
-npm install express pg ioredis jsonwebtoken jwks-rsa dotenv cors helmet @aws-sdk/client-secrets-manager
-npm install --save-dev nodemon
+Instalar dependencias
 
+npm install
 
-## Para git hub 
+Crear el archivo .env
 
-1. Preparar todos los cambios nuevos o modificados
+Ejemplo:
 
-git add .
+PORT=5000
 
-2. Guardar el punto de control con un mensaje claro
+DATABASE_URL=...
 
-git commit -m "cambios"
+FEATURE_AUTH_ENABLED=false
 
-3. Subir los cambios a la nube (ya no necesitas el -u origin main)
+Ejecutar
 
-git push
+npm run dev
+
+o en producción
+
+npm start
+3. Frontend
+
+Entrar al frontend
+
+cd frontend
+
+Instalar dependencias
+
+npm install
+
+Ejecutar
+
+npm run dev
+
+Compilar
+
+npm run build
+
+Vista previa
+
+npm run preview
+Despliegue en AWS EC2
+Actualizar sistema
+sudo dnf update -y
+Instalar Git
+sudo dnf install git -y
+Instalar Node.js 20
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+
+sudo dnf install nodejs -y
+
+Verificar
+
+node -v
+
+npm -v
+Clonar el proyecto
+git clone https://github.com/Carlitos2004/compu-en-nube-.git
+
+cd compu-en-nube-
+Levantar Backend
+cd backend
+
+npm install
+
+pm2 start src/index.js --name backend
+Levantar Frontend
+cd ../frontend
+
+npm install
+
+pm2 start "npm run preview -- --host 0.0.0.0 --port 3000" --name frontend
+
+Guardar procesos
+
+pm2 save
+
+Verificar
+
+pm2 list
+
+Salida esperada
+
+backend   online
+
+frontend  online
+Health Checks
+
+Liveness
+
+GET /api/health/liveness
+
+Readiness
+
+GET /api/health/readiness
+
+Metrics
+
+GET /api/health/metrics
+
+Ejemplo
+
+curl http://localhost:5000/api/health/liveness
+CI/CD
+
+El proyecto utiliza GitHub Actions.
+
+En cada push a la rama main se ejecuta automáticamente:
+
+Instalación de dependencias
+Ejecución de pruebas con Jest
+Construcción de la imagen Docker
+
+Archivo:
+
+.github/workflows/ci.yml
+Docker
+
+Construir imagen
+
+cd backend
+
+docker build -t todoapp-backend .
+Acceso a la aplicación
+
+Frontend
+
+http://IP_PUBLICA_EC2:3000
+
+Backend
+
+http://IP_PUBLICA_EC2:5000
+
+Health Check
+
+http://IP_PUBLICA_EC2:5000/api/health/liveness
+Estructura del proyecto
+compu-en-nube-
+
+├── backend
+│   ├── controllers
+│   ├── middlewares
+│   ├── models
+│   ├── routes
+│   ├── src
+│   ├── tests
+│   ├── Dockerfile
+│   └── package.json
+│
+├── frontend
+│   ├── src
+│   ├── public
+│   ├── package.json
+│   └── vite.config.js
+│
+├── infra
+│
+└── .github
+    └── workflows
+        └── ci.yml
+Mejoras implementadas respecto a la Evaluación 1
+Despliegue completo en AWS EC2.
+Integración con base de datos Neon PostgreSQL.
+Ejecución del backend y frontend mediante PM2.
+Health Checks (Liveness, Readiness y Metrics).
+Pipeline CI con GitHub Actions.
+Dockerfile para el backend.
+Uso de variables de entorno para la configuración.
