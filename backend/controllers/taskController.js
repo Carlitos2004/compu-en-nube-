@@ -130,39 +130,33 @@ const updateTask = async (req, res) => {
     }
 
     const { title, notes, category, dueDate, completed } = req.body
-    if (
-      title === undefined &&
-      notes === undefined &&
-      category === undefined &&
-      dueDate === undefined &&
-      completed === undefined
-    ) {
+    
+    const updates = {}
+    if (title !== undefined) updates.title = title.trim()
+    if (notes !== undefined) updates.notes = notes
+    if (category !== undefined) updates.category = category
+    if (dueDate !== undefined) updates.due_date = dueDate
+    if (completed !== undefined) updates.completed = completed
+
+    if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'Debes enviar al menos un campo para actualizar' })
     }
 
-    if (title !== undefined && !String(title).trim()) {
+    if (updates.title !== undefined && !updates.title) {
       return res.status(400).json({ error: 'El titulo no puede estar vacio' })
     }
 
+    const fields = Object.keys(updates)
+    const values = Object.values(updates)
+    const setClause = fields.map((field, i) => `${field} = $${i + 1}`).join(', ')
+
     const { rows } = await pool.query(
       `UPDATE tareas
-       SET title = COALESCE($1, title),
-           notes = COALESCE($2, notes),
-           category = COALESCE($3, category),
-           due_date = COALESCE($4, due_date),
-           completed = COALESCE($5, completed),
+       SET ${setClause},
            updated_at = NOW()
-       WHERE id = $6 AND cognito_sub = $7 AND deleted_at IS NULL
+       WHERE id = $${fields.length + 1} AND cognito_sub = $${fields.length + 2} AND deleted_at IS NULL
        RETURNING *`,
-      [
-        title === undefined ? null : String(title).trim(),
-        notes === undefined ? null : notes,
-        category === undefined ? null : category,
-        dueDate === undefined ? null : dueDate,
-        completed === undefined ? null : completed,
-        taskId,
-        req.userId
-      ]
+      [...values, taskId, req.userId]
     )
 
     if (rows.length === 0) {
