@@ -6,7 +6,10 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   user:     process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.DB_HOST ? {
+    rejectUnauthorized: true,
+    ca: require('fs').readFileSync('./global-bundle.pem').toString()
+  } : false
 })
 
 module.exports = pool
